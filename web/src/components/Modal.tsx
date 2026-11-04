@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from "react";
+import { useEffect, useId, useLayoutEffect, useRef, type ReactNode } from "react";
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -33,20 +33,26 @@ export function Modal({
   className = "",
 }: ModalProps) {
   const dialogRef = useRef<HTMLDivElement>(null);
-  const returnFocusTo = useRef<HTMLElement | null>(null);
+  const onCloseRef = useRef(onClose);
   const titleId = useId();
+
+  useLayoutEffect(() => {
+    onCloseRef.current = onClose;
+  }, [onClose]);
 
   useEffect(() => {
     if (!open) return;
 
-    returnFocusTo.current = document.activeElement as HTMLElement | null;
+    // Own focus for this opening; callback-only rerenders must not recapture it.
+    const returnFocusTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
     const node = dialogRef.current;
     node?.querySelector<HTMLElement>(FOCUSABLE)?.focus();
 
     function onKeyDown(event: KeyboardEvent) {
       if (event.key === "Escape") {
         event.stopPropagation();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (event.key !== "Tab" || !node) return;
@@ -71,10 +77,16 @@ export function Modal({
 
     return () => {
       document.removeEventListener("keydown", onKeyDown);
-      document.body.style.overflow = "";
-      returnFocusTo.current?.focus();
+      document.body.style.overflow = previousOverflow;
+      if (
+        returnFocusTo?.isConnected &&
+        !returnFocusTo.matches(':disabled, [aria-disabled="true"]') &&
+        !returnFocusTo.closest("[hidden], [inert]")
+      ) {
+        returnFocusTo.focus();
+      }
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
 
@@ -82,7 +94,11 @@ export function Modal({
     <div
       className="overlay"
       onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
+        if (event.target === event.currentTarget) {
+          // Dismiss without the native mousedown moving focus after cleanup.
+          event.preventDefault();
+          onClose();
+        }
       }}
     >
       <div

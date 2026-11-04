@@ -1,13 +1,13 @@
 import re
 
-from flask import current_app
+from flask import current_app, g
 
 from ..extensions import db
 from ..models import Department, Employee, User
 from ..permissions import CONSOLE_ROLES
 from . import employee_service
 from .activity_service import log as log_activity
-from .errors import AuthError
+from .errors import AuthError, EmployeeError
 from .passwords import dummy_verify, hash_password, validate_password, verify_password
 
 USERNAME_RE = re.compile(r"^[a-zA-Z0-9._-]{3,30}$")
@@ -107,10 +107,19 @@ def register_user(fields):
             },
             user.id,
         )
-    except Exception as err:
+    except (AuthError, EmployeeError) as err:
         # Don't leave an orphaned login behind if the profile couldn't be created.
         db.session.rollback()
-        raise AuthError(getattr(err, "message", str(err))) from err
+        raise AuthError(err.message) from None
+    except Exception as err:
+        db.session.rollback()
+        # Exception messages/tracebacks can contain SQL parameters or credentials.
+        current_app.logger.error(
+            "Registration profile creation failed (%s)",
+            type(err).__name__,
+            extra={"request_id": g.get("request_id")},
+        )
+        raise AuthError("Could not create your account. Please try again.") from None
 
     log_activity(user.id, "REGISTER", "user", user.id)
     return user

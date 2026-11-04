@@ -480,7 +480,7 @@ function TaskDialog({ task, onClose }: { task: Partial<Task> | null; onClose: ()
           <FormError message={error} />
 
           <Field label="Title" htmlFor="task-title">
-            <input id="task-title" name="title" defaultValue={task.title ?? ""} required autoFocus />
+            <input id="task-title" name="title" defaultValue={task.title ?? ""} required />
           </Field>
 
           <Field label="Description" htmlFor="task-description">

@@ -33,3 +33,6 @@ loglevel = os.environ.get("LOG_LEVEL", "info")
 access_log_format = '%({x-forwarded-for}i)s "%(r)s" %(s)s %(b)s %(M)sms'
 
 preload_app = False  # each worker opens its own DB connections after forking
+
+# Keep the pre-upgrade trust default; newer Gunicorn also trusts IPv6 loopback.
+forwarded_allow_ips = os.environ.get("FORWARDED_ALLOW_IPS", "127.0.0.1")

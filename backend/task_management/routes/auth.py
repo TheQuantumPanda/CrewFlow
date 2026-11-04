@@ -1,8 +1,9 @@
 import time
 
-from flask import Blueprint, g, jsonify, request, session
+from flask import Blueprint, current_app, g, jsonify, request, session
 
 from ..auth_decorators import login_required
+from ..extensions import db
 from ..services import auth_service, employee_service
 from ..services.errors import AuthError
 
@@ -37,6 +38,15 @@ def register():
         return jsonify({"user": user.to_dict()}), 201
     except AuthError as err:
         return jsonify({"error": err.message}), err.status
+    except Exception as err:
+        # Protect failures outside profile creation without logging payloads or SQL.
+        db.session.rollback()
+        current_app.logger.error(
+            "Registration failed (%s)",
+            type(err).__name__,
+            extra={"request_id": g.get("request_id")},
+        )
+        return jsonify({"error": "Something went wrong on the server"}), 500
 
 
 def _login(console):

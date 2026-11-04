@@ -231,7 +231,6 @@ export function EmployeeDialog({
                 name="first_name"
                 defaultValue={employee.first_name ?? ""}
                 required
-                autoFocus
               />
             </Field>
             <Field label="Last name" htmlFor="emp-last">

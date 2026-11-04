@@ -143,7 +143,7 @@ function DepartmentDialog({ open, onClose }: { open: boolean; onClose: () => voi
           <FormError message={error} />
 
           <Field label="Name" htmlFor="dept-name">
-            <input id="dept-name" name="name" required autoFocus placeholder="Engineering" />
+            <input id="dept-name" name="name" required placeholder="Engineering" />
           </Field>
 
           <Field label="Description" htmlFor="dept-description">

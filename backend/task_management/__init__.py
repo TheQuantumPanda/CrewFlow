@@ -6,6 +6,7 @@ is first-party, so there is no CORS surface and no token in local storage.
 """
 import os
 
+from click import ClickException
 from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.exceptions import HTTPException
 
@@ -119,9 +120,12 @@ def bootstrap(app):
         else:
             db.create_all()
         ensure_baseline(app)
-    except Exception:  # noqa: BLE001 - a boot-time DB hiccup shouldn't kill the process
+    except Exception as err:  # noqa: BLE001 - preserve the existing non-fatal bootstrap policy
         db.session.rollback()
-        app.logger.exception("Bootstrap skipped — database not ready")
+        app.logger.error(
+            "Bootstrap skipped; check database readiness and BOOTSTRAP_ADMIN_PASSWORD (%s)",
+            type(err).__name__,
+        )
 
 
 def register_cli(app):
@@ -140,8 +144,15 @@ def register_cli(app):
 
     @app.cli.command("create-admin")
     def create_admin():
-        """Prints the bootstrap admin credentials, creating the account if needed."""
+        """Provisions the initial admin from private configuration without printing secrets."""
         from .seed import ensure_baseline
 
-        result = ensure_baseline(app, force=True)
+        try:
+            result = ensure_baseline(app, force=True)
+        except Exception as err:
+            db.session.rollback()
+            app.logger.error("Administrator provisioning failed (%s)", type(err).__name__)
+            raise ClickException(
+                "Could not provision administrator; check database readiness and BOOTSTRAP_ADMIN_PASSWORD."
+            ) from None
         print(result or "Admin account already exists.")

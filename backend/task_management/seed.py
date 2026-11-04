@@ -3,7 +3,6 @@
 Run via `flask --app task_management seed` (see backend/run.py for the
 FLASK_APP entrypoint), or `python -m task_management.seed` from backend/.
 """
-import secrets
 from datetime import date, datetime
 
 from .extensions import db
@@ -142,8 +141,14 @@ def ensure_baseline(app, force=False):
 
     A fresh deploy otherwise has an empty department list, which leaves the
     signup form with nothing to pick and no way to create the first user.
-    Returns a human-readable note when it creates the admin, else None.
+    Initial admin creation requires a privately configured password. Returns a
+    non-secret note when it creates the admin, else None.
     """
+    existing_admin = User.query.filter(User.role.in_(("super_admin", "admin"))).first()
+    password = app.config.get("BOOTSTRAP_ADMIN_PASSWORD")
+    if not existing_admin and not password:
+        raise RuntimeError("BOOTSTRAP_ADMIN_PASSWORD is required to create the initial administrator")
+
     created = []
 
     if not Department.query.first():
@@ -154,7 +159,6 @@ def ensure_baseline(app, force=False):
         db.session.commit()
         created.append(f"{len(DEFAULT_DEPARTMENTS)} departments")
 
-    existing_admin = User.query.filter(User.role.in_(("super_admin", "admin"))).first()
     if existing_admin and not force:
         if created:
             app.logger.info("Bootstrap created: %s", ", ".join(created))
@@ -163,27 +167,11 @@ def ensure_baseline(app, force=False):
         return f"Admin account already exists: {existing_admin.username}"
 
     username = app.config["BOOTSTRAP_ADMIN_USERNAME"]
-    password = app.config.get("BOOTSTRAP_ADMIN_PASSWORD")
-    generated = password is None
-    if generated:
-        # Never ship a hard-coded production password. If the operator didn't
-        # supply one, mint a random password and print it exactly once.
-        password = secrets.token_urlsafe(12)
-
     admin = User(username=username, password_hash=_hash(password), role="super_admin")
     db.session.add(admin)
     db.session.commit()
 
-    note = f"Created admin '{username}'"
-    if generated:
-        note += f" with generated password: {password}"
-        app.logger.warning(
-            "BOOTSTRAP ADMIN CREATED — username=%s password=%s "
-            "(set BOOTSTRAP_ADMIN_PASSWORD to choose your own, then change it after first login)",
-            username,
-            password,
-        )
-    return note
+    return f"Created admin '{username}'"
 
 
 if __name__ == "__main__":
