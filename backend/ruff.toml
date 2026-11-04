@@ -1,0 +1,14 @@
+line-length = 110
+target-version = "py312"
+
+exclude = ["migrations/versions", "venv", ".venv"]
+
+[lint]
+select = ["E", "F", "W", "I", "B", "UP", "C4"]
+ignore = [
+  "E501",  # line length is enforced by the formatter, not the linter
+  "B008",  # Flask and SQLAlchemy idioms rely on calls in defaults
+]
+
+[lint.per-file-ignores]
+"tests/*" = ["F811"]  # pytest fixtures shadow their own names by design

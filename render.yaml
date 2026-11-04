@@ -1,0 +1,45 @@
+# Render blueprint — https://render.com/docs/blueprint-spec
+#
+# Deploy with: New > Blueprint, point it at this repository.
+# Render reads this file and creates both the web service and the database,
+# wiring DATABASE_URL between them automatically.
+
+services:
+  - type: web
+    name: taskforge
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/healthz
+    envVars:
+      - key: APP_ENV
+        value: production
+
+      # Generated once by Render and then held constant. A changing key would
+      # sign every visitor out on each deploy.
+      - key: SECRET_KEY
+        generateValue: true
+
+      # Injected from the database below — no connection string in the repo.
+      - key: DATABASE_URL
+        fromDatabase:
+          name: taskforge-db
+          property: connectionString
+
+      - key: BOOTSTRAP_ADMIN_USERNAME
+        value: admin
+      # Leave unset to have the app mint a random admin password on first boot
+      # and print it once in the deploy log. Set it here (as a secret) only if
+      # you want to choose the password yourself.
+      - key: BOOTSTRAP_ADMIN_PASSWORD
+        sync: false
+
+      - key: WEB_CONCURRENCY
+        value: "2"
+
+databases:
+  - name: taskforge-db
+    plan: free
+    databaseName: taskforge
+    user: taskforge

@@ -1,0 +1,21 @@
+# Local Postgres for development: `docker compose up -d db`, then put
+#   DATABASE_URL=postgresql://taskforge:taskforge@localhost:5432/taskforge
+# in backend/.env. The app runs its migrations on boot.
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: taskforge
+      POSTGRES_PASSWORD: taskforge
+      POSTGRES_DB: taskforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U taskforge"]
+      interval: 5s
+      retries: 10
+
+volumes:
+  pgdata:

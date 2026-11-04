@@ -1,0 +1,266 @@
+/* CrewFlow foundations. Keep semantic token names stable for existing consumers.
+   Light/dark surfaces, text and interactions are defined together here. */
+
+:root {
+  /* --- Neutral ramp -----------------------------------------------------
+     Cool neutrals with midnight navy for primary text. */
+  --grey-0: #FFFFFF;
+  --grey-25: #FAFBFE;
+  --grey-50: #F6F7FB;
+  --grey-100: #EEF0F7;
+  --grey-150: #E5E8F1;
+  --grey-200: #D8DDEA;
+  --grey-300: #B6BFD2;
+  --grey-400: #7A859D;
+  --grey-500: #5D6880;
+  --grey-600: #505D76;
+  --grey-700: #3D4962;
+  --grey-800: #29354E;
+  --grey-900: #17213A;
+  --grey-950: #101625;
+
+  /* --- Accent ---------------------------------------------------------- */
+  --accent-50: #EFEDFF;
+  --accent-100: #E1DDFF;
+  --accent-200: #C6BEFA;
+  --accent-400: #A9B7F7;
+  --accent-500: #5146D8;
+  --accent-600: #5146D8;
+  --accent-700: #4035B8;
+
+  /* --- Status ----------------------------------------------------------
+     Muted rather than saturated. A status pill sits next to body text all
+     day; a full-strength red vibrates against it. */
+  --red-50: #fef2f2;
+  --red-100: #fee2e2;
+  --red-500: #e5484d;
+  --red-600: #ce2c31;
+  --red-700: #a51f23;
+
+  --amber-50: #fff8eb;
+  --amber-100: #ffefc9;
+  --amber-500: #9C651F;
+  --amber-700: #85551C;
+
+  --green-50: #eefbf3;
+  --green-100: #d3f3e0;
+  --green-500: #238354;
+  --green-700: #1B7147;
+
+  --blue-50: #eff6ff;
+  --blue-100: #dbeafe;
+  --blue-500: #2869CD;
+  --blue-700: #1d4ed8;
+
+  /* --- Semantic surfaces ------------------------------------------------ */
+  --bg: var(--grey-50);
+  --surface: var(--grey-0);
+  --surface-raised: var(--grey-0);
+  --surface-sunken: var(--grey-100);
+  --surface-hover: var(--grey-100);
+  --surface-active: var(--grey-150);
+
+  --border: var(--grey-150);
+  --border-subtle: #EDF0F6;
+  --border-strong: var(--grey-300);
+
+  --text: var(--grey-900);
+  --text-secondary: var(--grey-600);
+  --text-muted: var(--grey-500);
+  --text-faint: var(--grey-500);
+  --text-on-accent: #ffffff;
+
+  --accent: var(--accent-600);
+  --accent-hover: var(--accent-700);
+  --accent-text: var(--accent-600);
+  --accent-bg: var(--accent-50);
+  --accent-border: var(--accent-200);
+
+  --danger: var(--red-600);
+  --danger-bg: var(--red-50);
+  --danger-border: var(--red-100);
+
+  /* --- Type: bundled interface, display and technical families ---------- */
+  --font-sans: "Manrope Variable", "Manrope", -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  --font-display: "Bricolage Grotesque Variable", "Manrope Variable", sans-serif;
+  --font-mono: "JetBrains Mono Variable", "SF Mono", ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+
+  --text-2xs: 10.5px;
+  --text-xs: 11.5px;
+  --text-sm: 13px;
+  --text-base: 14px;
+  --text-md: 15px;
+  --text-lg: 18px;
+  --text-xl: 22px;
+  --text-2xl: 34px;
+  --text-3xl: 56px;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.65;
+
+  /* Optical correction: large text needs negative tracking to avoid looking
+     loose, small text needs positive tracking to stay legible. */
+  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.03em;
+  --tracking-wide: 0.04em;
+  --tracking-widest: 0.08em;
+
+  /* --- Space -----------------------------------------------------------
+     4px base grid. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* --- Radii -----------------------------------------------------------
+     Compact controls and 10–14px card/dialog corners. */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius: 10px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-full: 999px;
+
+  /* --- Elevation -------------------------------------------------------
+     Borders do the separating. Shadows are reserved for things that genuinely
+     float above the page: menus, dialogs, popovers. */
+  --shadow-xs: 0 1px 2px rgba(16, 20, 28, 0.04);
+  --shadow-sm: 0 1px 3px rgba(16, 20, 28, 0.06), 0 1px 2px rgba(16, 20, 28, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(16, 20, 28, 0.08), 0 2px 6px -2px rgba(16, 20, 28, 0.05);
+  --shadow-lg: 0 12px 32px -8px rgba(16, 20, 28, 0.14), 0 4px 12px -4px rgba(16, 20, 28, 0.08);
+  --shadow-xl: 0 24px 56px -12px rgba(16, 20, 28, 0.22);
+
+  --ring: 0 0 0 3px var(--accent-100);
+  --ring-danger: 0 0 0 3px var(--red-100);
+
+  /* --- Motion ----------------------------------------------------------
+     Short and unshowy. Anything over ~200ms in a tool feels like lag. */
+  --ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --duration-fast: 120ms;
+  --duration: 180ms;
+  --duration-slow: 180ms;
+
+  /* --- Layout ---------------------------------------------------------- */
+  --sidebar-w: 248px;
+  --topbar-h: 68px;
+  --content-max: 1440px;
+
+  --accent-active: var(--accent-hover);
+  --focus-color: var(--accent);
+  --control-border: #7A859D;
+  --control-border-hover: #505D76;
+  --backdrop: rgba(16, 22, 37, 0.52);
+
+  /* Fixed navy surfaces used by the existing sidebar and sign-in layouts. */
+  --ink: #17213A;
+  --ink-2: #1B2334;
+  --ink-3: #222C40;
+  --ink-line: #44516D;
+  --ink-text: #F2F4FC;
+  --ink-muted: #B9C3D9;
+  --ink-accent: #B4ACFF;
+  --ink-accent-hover: #C6BEFF;
+  --ink-accent-bg: #2C2850;
+  --ink-control-border: #7E8BA6;
+  --brand-primary: #5146D8;
+  --brand-soft: #A9B7F7;
+  --brand-dark-accent: #B4ACFF;
+  --brand-amber: #C18435;
+  /* Legacy names remain available, but no longer introduce orange/teal branding. */
+  --ember: var(--ink-accent);
+  --teal: var(--brand-soft);
+  --amber: #E1B576;
+  --ease-spring: var(--ease-out);
+
+  --role-super-admin: var(--accent-text);
+  --role-admin: var(--amber-700);
+  --role-hr: #98426D;
+  --role-hr-on-ink: #F0ACD0;
+  --role-employee-on-ink: #AFD0FF;
+  --role-manager: var(--accent-text);
+  --role-team-lead: #5265A6;
+  --role-employee: var(--blue-700);
+  --role-auditor: var(--text-secondary);
+
+  --avatar-0: #5146D8;
+  --avatar-1: #4035B8;
+  --avatar-2: #5265A6;
+  --avatar-3: #85551C;
+  --avatar-4: #814568;
+  --avatar-5: #3D4962;
+
+  color-scheme: light;
+}
+
+/* ThemeProvider and theme-init.js both set this attribute; storage is unchanged. */
+:root[data-theme="dark"] {
+  --bg: #101625;
+  --surface: #1B2334;
+  --surface-raised: #222C40;
+  --surface-sunken: #151D2D;
+  --surface-hover: #28334A;
+  --surface-active: #303C55;
+
+  --border: #36425B;
+  --border-subtle: #2B364D;
+  --border-strong: #5D6C89;
+  --control-border: #7E8BA6;
+  --control-border-hover: #A4B1CA;
+
+  --text: #F2F4FC;
+  --text-secondary: #CCD3E4;
+  --text-muted: #B1BDD4;
+  --text-faint: #A4B1CA;
+  --text-on-accent: #17213A;
+
+  --accent: #B4ACFF;
+  --accent-hover: #C6BEFF;
+  --accent-active: #A9B7F7;
+  --accent-text: #B4ACFF;
+  --accent-bg: #2C2850;
+  --accent-border: #7167AC;
+
+  --danger: #FF9DA4;
+  --danger-bg: #38232E;
+  --danger-border: #804552;
+  --red-50: #38232E;
+  --red-100: #603440;
+  --red-500: #FF9DA4;
+  --red-600: #FF9DA4;
+  --red-700: #FFB6BC;
+
+  --amber-50: #342B21;
+  --amber-100: #51402A;
+  --amber-500: #E1B576;
+  --amber-700: #F0C892;
+  --green-50: #19332A;
+  --green-100: #294F3D;
+  --green-500: #68CD96;
+  --green-700: #97DFB5;
+  --blue-50: #1C304D;
+  --blue-100: #2A4569;
+  --blue-500: #8DBBFF;
+  --blue-700: #AFD0FF;
+
+  --role-hr: #F0ACD0;
+  --role-team-lead: #A9B7F7;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.12);
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.16);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.24);
+  --shadow-lg: 0 12px 32px -8px rgba(0, 0, 0, 0.32);
+  --shadow-xl: 0 20px 48px -12px rgba(0, 0, 0, 0.4);
+  --ring: 0 0 0 3px rgba(180, 172, 255, 0.24);
+  --ring-danger: 0 0 0 3px rgba(255, 157, 164, 0.24);
+
+  color-scheme: dark;
+}

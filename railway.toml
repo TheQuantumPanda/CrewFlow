@@ -1,0 +1,13 @@
+# Railway config. The Dockerfile is the source of truth for the build, so the
+# same image runs locally, on Render, and here — no host-specific build script
+# that can drift out of sync with the app.
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+healthcheckPath = "/api/healthz"
+healthcheckTimeout = 120
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 3
