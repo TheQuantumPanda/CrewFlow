@@ -122,6 +122,15 @@ jobs:
         run: |
           python tools/ci/release_checks.py source output/ci/image/source.json --require-clean
           python -c 'import json,os; d=json.load(open("output/ci/image/source.json")); assert d["commit"]==os.environ["GITHUB_SHA"]; print("scope="+d["security_scope_sha256"])' >> "$GITHUB_OUTPUT"
+      - name: Configure Docker containerd image store
+        uses: docker/setup-docker-action@7ec28a010822b4626af4874f9448a4b05ac6f3e5 # v5.6.0
+        with:
+          daemon-config: |
+            {
+              "features": {
+                "containerd-snapshotter": true
+              }
+            }
       - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
       - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
         id: build
