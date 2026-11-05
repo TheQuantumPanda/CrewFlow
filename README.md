@@ -1,74 +1,143 @@
-# CrewFlow
+<h1 align="center">
+  <img src="docs/assets/crewflow-header.gif" alt="CrewFlow" width="960">
+</h1>
 
-**Keep teams and work in sync.**
+<p align="center"><strong>Keep teams and work in sync.</strong></p>
 
-CrewFlow is a workforce and task-management platform with role-based workspaces, department-scoped management, task ownership and progress tracking. It has an original connected-path identity, a navy and indigo interface, and consistent light and dark themes.
+<p align="center">
+  A workforce and task-management workspace for organizing people, ownership, and progress in one place.
+</p>
 
-## Screenshots
+<p align="center">
+  <a href="https://github.com/TheQuantumPanda/CrewFlow/actions/workflows/ci.yml"><img src="https://github.com/TheQuantumPanda/CrewFlow/actions/workflows/ci.yml/badge.svg?branch=main" alt="GitHub Actions CI status"></a>
+  <a href="https://react.dev/"><img src="https://img.shields.io/badge/React-18.3-5146D8" alt="React 18.3"></a>
+  <a href="https://www.typescriptlang.org/"><img src="https://img.shields.io/badge/TypeScript-5.9-5146D8" alt="TypeScript 5.9"></a>
+  <a href="https://flask.palletsprojects.com/"><img src="https://img.shields.io/badge/Flask-3.1-17213A" alt="Flask 3.1"></a>
+  <a href="https://www.postgresql.org/"><img src="https://img.shields.io/badge/PostgreSQL-17-17213A" alt="PostgreSQL 17"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-5146D8" alt="MIT License"></a>
+</p>
 
-These are actual browser captures of the finished interface using **temporary fictional API fixtures**. They demonstrate presentation, not live database contents, backend authorization or persistence. Desktop captures use a 1440 × 1000 viewport; the mobile capture uses 390 × 844. No credentials are shown.
+<p align="center">
+  <a href="https://crewflow-a18v.onrender.com/"><strong>Deployment Preview</strong></a> &nbsp;|&nbsp;
+  <a href="#quick-start">Quick Start</a> &nbsp;|&nbsp;
+  <a href="#architecture-overview">Architecture</a> &nbsp;|&nbsp;
+  <a href="#testing-and-verification">Verification</a> &nbsp;|&nbsp;
+  <a href="#documentation">Documentation</a>
+</p>
 
-<table>
-<tr><td width="50%"><img src="docs/screenshots/crewflow/mock-overview-light.png" alt="CrewFlow overview in light theme, fictional data"><br>Overview · light</td><td width="50%"><img src="docs/screenshots/crewflow/mock-overview-dark.png" alt="CrewFlow overview in dark theme, fictional data"><br>Overview · dark</td></tr>
-<tr><td><img src="docs/screenshots/crewflow/mock-kanban-light.png" alt="CrewFlow populated Kanban board in light theme, fictional data"><br>Kanban · light</td><td><img src="docs/screenshots/crewflow/mock-kanban-dark.png" alt="CrewFlow populated Kanban board in dark theme, fictional data"><br>Kanban · dark</td></tr>
-<tr><td><img src="docs/screenshots/crewflow/mock-task-list.png" alt="CrewFlow task list, fictional data"><br>Task list</td><td><img src="docs/screenshots/crewflow/mock-people.png" alt="CrewFlow people directory, fictional data"><br>People</td></tr>
-<tr><td><img src="docs/screenshots/crewflow/mock-departments.png" alt="CrewFlow departments and members, fictional data"><br>Departments</td><td><img src="docs/screenshots/crewflow/mock-audit.png" alt="CrewFlow connected audit history, fictional data"><br>Audit history</td></tr>
-<tr><td><img src="docs/screenshots/crewflow/mock-roles.png" alt="CrewFlow role hierarchy and permission matrix, fictional data"><br>Roles and permissions</td><td align="center"><img src="docs/screenshots/crewflow/mock-mobile-my-tasks.png" alt="CrewFlow My Tasks on mobile, fictional data" width="300"><br>My Tasks · mobile</td></tr>
-</table>
+> [!NOTE]
+> The Render site is a deployed preview. Hosted database migrations and initial Super Admin provisioning have not yet been completed or verified, so it is not a fully verified interactive demo. See [Deployment Preview](#deployment-preview).
 
-[More screen captures](docs/SCREENSHOTS.md) · [Final verification and readiness report](docs/VERIFICATION.md)
+---
 
-## Features
+## Application Showcase
 
-- Seven existing roles: super admin, admin, HR, manager, team lead, employee and auditor. Capabilities follow the server's permission map.
-- Department-scoped people and assignment management for managers and team leads; employees view and update their own assignments.
-- Task creation and editing, eligible employee assignment, priority, descriptions, notes, optional estimated hours, and assignment status/progress updates.
-- Five-column assignment Kanban with native desktop drag-and-drop, plus a task list with search, priority filtering and sorting by title, priority or update time.
-- Overview and My Tasks summaries calculated from the existing API data.
-- People and department management, account deactivation/unlocking, confirmed role changes and a read-only permission matrix where permitted.
-- Activity history with existing action filters, actor/timestamp information and a connected timeline. Backend audit records contain before/after data; the UI displays existing summaries and selected titles/names, **not a full snapshot viewer**.
-- Command palette at **Ctrl/Cmd + K**, existing `g`-then-key navigation shortcuts, theme switching, account details and password updates.
-- Separate administrative sign-in with the existing console access restrictions and idle-session policy.
+### Screenshots
 
-Board filtering is independent of task-list filtering. There is no calendar, due-date management, messaging, advanced analytics, or separate touch/keyboard drag implementation. The task API supports paging, but the current task-list request fetches at most 200 records and the UI has no page controls.
+CrewFlow combines a midnight-navy navigation shell with indigo accents and light and dark workspaces. These are actual browser captures using **temporary fictional API fixtures**; they show presentation, not production records or proof of backend behavior.
 
-## Technology and architecture
+|                                                      Overview · light                                                      |                                                     Overview · dark                                                      |
+| :------------------------------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------: |
+| <img src="docs/screenshots/crewflow/mock-overview-light.png" alt="CrewFlow overview dashboard in light theme" width="440"> | <img src="docs/screenshots/crewflow/mock-overview-dark.png" alt="CrewFlow overview dashboard in dark theme" width="440"> |
+|                                                     **Kanban · light**                                                     |                                                    **Kanban · dark**                                                     |
+|     <img src="docs/screenshots/crewflow/mock-kanban-light.png" alt="CrewFlow Kanban board in light theme" width="440">     |     <img src="docs/screenshots/crewflow/mock-kanban-dark.png" alt="CrewFlow Kanban board in dark theme" width="440">     |
+|                                                    **Task management**                                                     |                                                        **People**                                                        |
+|               <img src="docs/screenshots/crewflow/mock-task-list.png" alt="CrewFlow task list" width="440">                |            <img src="docs/screenshots/crewflow/mock-people.png" alt="CrewFlow people directory" width="440">             |
+|                                                      **Departments**                                                       |                                                  **My Tasks · mobile**                                                   |
+|        <img src="docs/screenshots/crewflow/mock-departments.png" alt="CrewFlow department management" width="440">         | <img src="docs/screenshots/crewflow/mock-mobile-my-tasks.png" alt="CrewFlow My Tasks on a mobile viewport" width="220">  |
 
-| Layer | Implementation |
-| --- | --- |
-| Frontend | React 18, TypeScript, Vite 6.4.5, React Router 7.18.5, TanStack Query 5, Lucide icons |
-| Styling | Existing CSS token system; locally bundled Manrope, Bricolage Grotesque and JetBrains Mono |
-| Backend | Flask 3.1.3, Gunicorn 26.2.0, Flask-SQLAlchemy, SQLAlchemy 2, Flask-Migrate/Alembic, Werkzeug password hashing |
-| Database | SQLite for unit tests/local use; PostgreSQL 17 verified with Psycopg-C 3.3.8; existing MySQL support |
-| Verification | Vitest, Testing Library, pytest, pytest-cov, Ruff and local Playwright browser inspection |
+[View the complete screenshot gallery](docs/SCREENSHOTS.md), including activity history and role management.
 
-`web/src/pages` contains route presentations; `layout` and `components` provide navigation, dialogs and shared controls. Typed requests and server state remain in `web/src/api`. Flask routes under `backend/task_management/routes` delegate to services and SQLAlchemy models. Server-side permissions and department predicates enforce access; browser guards only control navigation presentation. Session cookies and the existing CSRF mechanism are retained. Flask can serve the compiled SPA from `web/dist`; development uses Vite's API proxy.
+---
 
-## Local setup
+## Overview
 
-Use **Python 3.12** (reviewed 3.12.16), **Node.js 24.21.0** and npm with the existing lockfile. Psycopg-C requires a C compiler, matching Python development headers, libpq development headers and `pg_config`. On Debian/Ubuntu these normally come from `build-essential`, `python3-dev` and `libpq-dev`; installing system packages requires your own approved environment. Other operating systems must provide equivalent native prerequisites. The reviewed production container targets linux/amd64; other platforms are not verified.
+CrewFlow gives teams a shared view of their people and work. Administrators and managers can organize employees and departments, assign tasks, and follow progress; employees can review and update their assigned work. Access depends on the user's existing role and, where applicable, department.
 
-Create an isolated backend environment from the project root using verified pip 26.3, without the older ensurepip bootstrap archive:
+The project demonstrates a React and TypeScript frontend connected to a Flask API, server-enforced permissions, relational data, audit history, and a Dockerized single-origin deployment.
+
+## Key Features
+
+- **Workforce and departments** — Manage employee records, roles, and departments through the existing permission-dependent interfaces.
+- **Role-based workspaces** — Seven roles have different capabilities, with department-scoped management for managers and team leads where supported.
+- **Task ownership and progress** — Create and edit tasks, assign eligible employees, and update assignment status and completion percentage.
+- **Kanban and task lists** — Follow assignments across five board columns or use the searchable task list with priority filtering and sorting.
+- **Dashboards and activity** — View existing summaries and audit events with actor, action, and timestamp information. The activity screen presents summaries rather than a full before/after snapshot viewer.
+- **Everyday navigation** — Use the command palette, existing keyboard shortcuts, account settings, and light or dark theme.
+- **Administrative console** — Use the separate administrative sign-in and existing people, role, and permission interfaces when authorized.
+
+Board filtering is independent of task-list filtering. Some screens do not have pagination controls; the task-list request fetches at most 200 records. Native board dragging has no separate touch or keyboard implementation.
+
+---
+
+## Architecture Overview
+
+The production image contains the compiled frontend and Flask application. Flask serves the React assets and REST API from the same origin; PostgreSQL is a separate database service.
+
+```mermaid
+flowchart LR
+    Browser["Browser: React + TypeScript"]
+    subgraph App["Docker application · single origin"]
+        Flask["Gunicorn + Flask REST API"]
+        Assets["Compiled React assets"]
+        Auth["Authentication and permissions"]
+        Services["Application services"]
+        ORM["SQLAlchemy + Psycopg-C"]
+        Flask --> Auth --> Services --> ORM
+        Flask --- Assets
+    end
+    Browser -->|"Same-origin API requests"| Flask
+    Assets -->|"Served to browser"| Browser
+    ORM -->|"PostgreSQL connection"| DB[("PostgreSQL")]
+```
+
+The backend enforces permissions and department boundaries. Frontend route guards control navigation presentation; they are not the authorization boundary. See the [architecture](docs/ARCHITECTURE.md) and [security](docs/SECURITY.md) documents for details.
+
+## Technology Stack
+
+| Layer              | Technologies                                                    | Purpose                                                                                                                         |
+| ------------------ | --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Frontend           | React 18.3, TypeScript 5.9, React Router 7.18, TanStack Query 5 | Workspace screens, routing, and server state                                                                                    |
+| Styling            | CSS design tokens; Manrope, Bricolage Grotesque, JetBrains Mono | CrewFlow visual system and locally bundled fonts                                                                                |
+| Frontend build     | Vite 6.4                                                        | Development server and production assets                                                                                        |
+| Backend            | Python 3.12, Flask 3.1, Gunicorn 26.2                           | REST API and production application server                                                                                      |
+| Data               | SQLAlchemy, Flask-Migrate/Alembic, Psycopg-C 3.3, PostgreSQL    | Relational models, migrations, and PostgreSQL access; PostgreSQL 17 was tested locally, and SQLite and MySQL are also supported |
+| Testing            | pytest, pytest-cov, Ruff, Vitest, Testing Library               | Backend and frontend checks                                                                                                     |
+| Containerization   | Docker; Node 24 build stage and Python 3.12 runtime             | Multistage image serving the frontend and API                                                                                   |
+| Deployment preview | Render Docker Web Service, Neon PostgreSQL                      | Hosted preview and database connection; setup remains incomplete                                                                |
+
+Versions reflect the checked-in manifests, lockfile, and reviewed container configuration.
+
+---
+
+## Quick Start
+
+### Local Setup
+
+Use Python 3.12 and Node.js 24.21.0 with npm. Building Psycopg-C also requires a C compiler, Python headers, libpq development headers, and `pg_config`. The reviewed production image targets `linux/amd64`.
+
+From the repository root, create the isolated backend environment and install the existing development requirements:
 
 ```bash
 python3.12 tools/ci/python_env.py backend/.venv --wheel output/tools/pip-26.3-py3-none-any.whl --download
 source backend/.venv/bin/activate
 python -m pip install --build-constraint tools/ci/build-constraints.txt -r backend/requirements-dev.txt
 cp backend/.env.example backend/.env
-cd backend
 ```
 
-Edit the private `.env` before startup: choose an explicitly authorized development database, private `SECRET_KEY`, `AUTO_BOOTSTRAP=0` unless initialization is approved, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` if creating the first administrator. Never commit this file. The bootstrap helper downloads only the checksum-pinned official pip wheel into the ignored output directory; it does not initialize a database. The reviewed native build constraints are build-only; see [native runtime details](docs/production-runtime.md).
+Edit `backend/.env` privately. Choose an authorized development database, set a private `SECRET_KEY`, and use `AUTO_BOOTSTRAP=0` unless startup writes are explicitly intended. A new initial administrator requires a private `BOOTSTRAP_ADMIN_PASSWORD`. Keep `.env` out of Git.
 
-**Startup can write to the database.** The existing `AUTO_BOOTSTRAP` default applies migrations and creates baseline departments/an initial admin on an empty database. Use that only for an explicitly authorized local database. Set `AUTO_BOOTSTRAP=0` when automatic initialization must be disabled. The `seed` CLI drops and recreates the demo database; it is deliberately excluded from this quick start. Existing accounts are not assumed to exist, and no credentials are published here.
+> [!WARNING]
+> Startup can apply migrations and create baseline records when automatic bootstrap is enabled. The existing demo seed drops and recreates tables. Follow the [controlled database preparation](docs/production-runtime.md#controlled-database-preparation) only for a database you are authorized to change; do not use the seed on preserved or public data. With bootstrap disabled, a fresh database needs the separately controlled migration and provisioning steps before sign-in can work.
 
-Start the API in the backend terminal:
+Start the backend from `backend/`:
 
 ```bash
+cd backend
 python run.py
 ```
 
-In another terminal, from the project root:
+In a second terminal, start the frontend from the repository root:
 
 ```bash
 cd web
@@ -76,40 +145,32 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173`. Vite proxies `/api` to `http://127.0.0.1:5000` by default. Use accounts authorized for your chosen development environment. New initial administrator provisioning requires the private configured password; passwords are not generated or printed by that command. Keep all credentials out of screenshots and reports.
+Open [http://localhost:5173](http://localhost:5173). Vite proxies `/api` to the local Flask server by default. See [Development](docs/DEVELOPMENT.md) for environment details and other checks.
 
-To compile the frontend locally:
+## Deployment Preview
 
-```bash
-cd web
-npm run build
-```
+**[Open the CrewFlow preview](https://crewflow-a18v.onrender.com/)**
 
-This produces `web/dist`; it does not deploy the application. [Development details](docs/DEVELOPMENT.md).
+CrewFlow has been deployed as a **Render Docker Web Service**, with Neon PostgreSQL connectivity reported by the user. On 2026-11-05, the preview root, `/api/healthz`, and `/api/readyz` returned HTTP 200; readiness reported the configured database reachable. A readiness check does not verify the schema or application accounts. Initial hosted database migrations and Super Admin provisioning have **not yet been completed or verified**, so the URL is a deployed preview rather than a fully verified interactive demo.
 
-## Environment configuration
+The database provider is user-reported; the endpoint checks above do not independently establish the provider. Host-specific permissions, recovery, and release checks still need verification. See [Deployment](DEPLOYMENT.md), [Production Runtime](docs/production-runtime.md), and [Release Assurance](docs/release-assurance.md).
 
-`SECRET_KEY` is mandatory in production, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` is required for a new initial administrator. Production workers require reviewed `DATABASE_URL` and `AUTO_BOOTSTRAP=0`; inspect database selection before any startup. The application retains its established internal configuration names.
+---
 
-| Variables | Purpose |
-| --- | --- |
-| `APP_ENV`, `FLASK_ENV` | Configuration selection; development is the default. `FLASK_ENV` also affects the dev runner's debug behavior. |
-| `SECRET_KEY` | Session-signing secret; keep private and stable. |
-| `DATABASE_URL` | Explicit database URL; takes precedence over `DB_*`. Without it or MySQL settings, SQLite stores its file under `backend/instance/`. |
-| `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Existing alternative MySQL configuration. |
-| `AUTO_BOOTSTRAP`, `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_PASSWORD` | Existing migration/baseline initialization and initial-account settings. |
-| `MIN_PASSWORD_LENGTH`, `MAX_FAILED_LOGINS`, `LOCKOUT_MINUTES` | Existing password and lockout policy. |
-| `ADMIN_IDLE_MINUTES`, `SESSION_LIFETIME_SECONDS` | Console idle timeout and session lifetime. |
-| `PORT` | Flask development runner port. |
-| `VITE_API_TARGET` | Vite development proxy target. |
-| `VITE_DEMO_MODE` | Optional demonstration-account presentation; disabled unless explicitly enabled. |
-| `WEB_CONCURRENCY`, `GUNICORN_THREADS`, `GUNICORN_TIMEOUT`, `LOG_LEVEL` | Existing Gunicorn worker/log settings; no hosting changes were made. |
+## Testing and Verification
 
-See [backend/.env.example](backend/.env.example) for the existing template. Do not copy private values into documentation.
+| Evidence                   | Scope and recorded result                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend suite              | **136 tests passed**, 82% coverage in the recorded local run; ordinary pytest used isolated SQLite and Flask test clients.                                                                                                                                                                                                                                                                                                                                                  |
+| Frontend suite             | **82 tests passed** in the recorded local Vitest run; TypeScript and the production build also passed.                                                                                                                                                                                                                                                                                                                                                                      |
+| PostgreSQL and permissions | Separate local integration campaigns exercised real PostgreSQL, role-based API authorization, department boundaries, migrations, and restricted database roles.                                                                                                                                                                                                                                                                                                             |
+| Browser and HTTPS          | Separate local browser and production-mode HTTPS campaigns covered representative workflows, cookies, CSRF, proxy trust, fonts, and logout behavior.                                                                                                                                                                                                                                                                                                                        |
+| GitHub Actions             | [Run #6](https://github.com/TheQuantumPanda/CrewFlow/actions/runs/42067986092) passed normal checks. In the latest observed [run #7](https://github.com/TheQuantumPanda/CrewFlow/actions/runs/42077446064), backend and frontend passed, while the Docker job failed at the vulnerability-regression step; formal release review was skipped. Check the [workflow runs](https://github.com/TheQuantumPanda/CrewFlow/actions/workflows/ci.yml) and badge for current status. |
+| Hosted application         | The preview and health/readiness endpoints returned HTTP 200 on 2026-11-05; Neon connectivity is user-reported. Migrations and initial Super Admin provisioning remain unverified and incomplete.                                                                                                                                                                                                                                                                           |
 
-## Tests and verification
+Recorded test counts and local campaigns do not constitute formal production-release approval. [Verification](docs/VERIFICATION.md) records an earlier local snapshot; the hosted run results above supersede its statement that GitHub Actions had not yet run. Residual image findings and owner decisions remain tracked in [Release Assurance](docs/release-assurance.md) and the [security decision register](docs/security-decisions.json).
 
-From `web/`:
+To run the existing frontend checks from `web/`:
 
 ```bash
 npm run typecheck
@@ -117,31 +178,25 @@ npm run test
 npm run build
 ```
 
-From `backend/`, with the development requirements installed:
+With the isolated development environment active, run backend checks from `backend/`:
 
 ```bash
 ruff check .
 pytest -q --cov=task_management --cov-report=term-missing
 ```
 
-Accepted local security work on **2026-11-05** includes **136 backend tests (82% coverage)**, **82 frontend tests**, TypeScript/build/Ruff, real isolated PostgreSQL integration and least-privilege roles, and actual production HTTPS/browser verification. Ordinary backend tests use Flask test clients and in-memory SQLite; the PostgreSQL and HTTPS campaigns are separate evidence. The selected screenshot gallery remains mock-data captures.
+## Documentation
 
-The accepted image has zero reported installed Python and npm full/runtime audit findings at the recorded snapshot. Its OS/native scan still reports **51 High package entries across 13 High IDs**, plus six Unknown IDs and an inactive ensurepip pip archive with six disclosed advisories. These are not owner-approved residual risks. [Verification](docs/VERIFICATION.md), [release policy](docs/release-assurance.md) and the [decision register](docs/security-decisions.json) distinguish historical acceptance, local CI-equivalent checks and remaining release gates. Hosted GitHub Actions has **not** been verified.
+| Document                                         | Contents                                                      |
+| ------------------------------------------------ | ------------------------------------------------------------- |
+| [Development](docs/DEVELOPMENT.md)               | Local setup, native prerequisites, and development checks     |
+| [Architecture](docs/ARCHITECTURE.md)             | Application layers and request flow                           |
+| [API reference](docs/API.md)                     | Existing API endpoints and request examples                   |
+| [Security](docs/SECURITY.md)                     | Authentication, permissions, and security architecture        |
+| [Screenshots](docs/SCREENSHOTS.md)               | Full fictional-fixture screenshot gallery                     |
+| [Verification](docs/VERIFICATION.md)             | Recorded local tests, integration evidence, and limitations   |
+| [Deployment](DEPLOYMENT.md)                      | Deployment preparation and operational considerations         |
+| [Production runtime](docs/production-runtime.md) | Configuration, database preparation, and native build details |
+| [Release assurance](docs/release-assurance.md)   | CI evidence, image scanning, and release review               |
 
-## Limitations and readiness
-
-**CONDITIONAL release readiness.** Security fixes and local integration evidence are available, but public deployment remains blocked on explicit residual-risk disposition, hosted CI on the reviewed source, and hosted ingress/database/recovery checks. Local acceptance is not public-deployment approval or security certification. The modal return-focus defect was corrected and regression-tested in Stage 2D.
-
-- Native drag-and-drop has no separate touch or keyboard implementation.
-- Dense tables and Kanban columns scroll inside their containers on smaller screens.
-- Board and list filters are independent; some screens have no pagination controls.
-- Audit details remain summaries rather than an expandable full before/after viewer.
-- Management request failures now display load-error messages rather than misleading empty states. Missing department-member data is marked unavailable; existing request/retry behavior is unchanged.
-
-[Final evidence, workflow status and remaining limitations](docs/VERIFICATION.md).
-
-## License and attribution
-
-The applicable MIT terms and copyright notice are preserved in [LICENSE](LICENSE), including the permission and warranty notices.
-
-The CrewFlow three-path C mark is original SVG geometry. Runtime library and font notices are preserved in [web/public/third-party-notices.txt](web/public/third-party-notices.txt), which is copied into frontend build output. Fonts retain their SIL Open Font License texts; Lucide retains its ISC notice, including the upstream third-party material included in that package's license file.
+---
