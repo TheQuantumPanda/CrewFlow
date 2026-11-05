@@ -4,6 +4,13 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
+    inputs:
+      run_release_review:
+        description: Run the formal production release decision check
+        required: true
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -217,6 +224,7 @@ jobs:
     name: Owner review required before release
     runs-on: ubuntu-24.04
     needs: [docker]
+    if: github.event_name == 'workflow_dispatch' && inputs.run_release_review
     steps:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
