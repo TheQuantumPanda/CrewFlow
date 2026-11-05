@@ -17,7 +17,10 @@ export default defineConfig({
   },
   build: {
     outDir: "dist",
-    sourcemap: true,
+    sourcemap: false,
+    // Keep every font subset compatible with CSP font-src 'self'. Returning
+    // undefined preserves Vite's normal inlining policy for other assets.
+    assetsInlineLimit: (filePath) => /\.(?:woff2?|ttf|otf)$/i.test(filePath) ? false : undefined,
   },
   test: {
     environment: "jsdom",

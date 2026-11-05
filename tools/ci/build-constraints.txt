@@ -1,0 +1,5 @@
+# Required by the reviewed Psycopg-C 3.3.8 source build. Builder only.
+# The setuptools Windows legacy-wheel advisory remains separately disclosed.
+setuptools==83.0.0
+wheel==0.48.0
+packaging==26.3

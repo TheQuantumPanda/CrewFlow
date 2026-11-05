@@ -36,29 +36,29 @@ Board filtering is independent of task-list filtering. There is no calendar, due
 
 | Layer | Implementation |
 | --- | --- |
-| Frontend | React 18, TypeScript, Vite 5, React Router 6, TanStack Query 5, Lucide icons |
+| Frontend | React 18, TypeScript, Vite 6.4.5, React Router 7.18.5, TanStack Query 5, Lucide icons |
 | Styling | Existing CSS token system; locally bundled Manrope, Bricolage Grotesque and JetBrains Mono |
-| Backend | Flask 3, Flask-SQLAlchemy, SQLAlchemy 2, Flask-Migrate/Alembic, Werkzeug password hashing |
-| Database | SQLite by default; existing PostgreSQL and MySQL driver support |
+| Backend | Flask 3.1.3, Gunicorn 26.2.0, Flask-SQLAlchemy, SQLAlchemy 2, Flask-Migrate/Alembic, Werkzeug password hashing |
+| Database | SQLite for unit tests/local use; PostgreSQL 17 verified with Psycopg-C 3.3.8; existing MySQL support |
 | Verification | Vitest, Testing Library, pytest, pytest-cov, Ruff and local Playwright browser inspection |
 
 `web/src/pages` contains route presentations; `layout` and `components` provide navigation, dialogs and shared controls. Typed requests and server state remain in `web/src/api`. Flask routes under `backend/task_management/routes` delegate to services and SQLAlchemy models. Server-side permissions and department predicates enforce access; browser guards only control navigation presentation. Session cookies and the existing CSRF mechanism are retained. Flask can serve the compiled SPA from `web/dist`; development uses Vite's API proxy.
 
 ## Local setup
 
-Requirements: **Python 3.11 or 3.12** and **Node.js 20+**. Pass 5 used Python 3.11; the existing CI targets 3.12. Start from this project directory. No external database server is needed for a new, explicitly chosen local SQLite environment.
+Use **Python 3.12** (reviewed 3.12.16), **Node.js 24.21.0** and npm with the existing lockfile. Psycopg-C requires a C compiler, matching Python development headers, libpq development headers and `pg_config`. On Debian/Ubuntu these normally come from `build-essential`, `python3-dev` and `libpq-dev`; installing system packages requires your own approved environment. Other operating systems must provide equivalent native prerequisites. The reviewed production container targets linux/amd64; other platforms are not verified.
 
-Create the backend environment:
+Create an isolated backend environment from the project root using verified pip 26.3, without the older ensurepip bootstrap archive:
 
 ```bash
+python3.12 tools/ci/python_env.py backend/.venv --wheel output/tools/pip-26.3-py3-none-any.whl --download
+source backend/.venv/bin/activate
+python -m pip install --build-constraint tools/ci/build-constraints.txt -r backend/requirements-dev.txt
+cp backend/.env.example backend/.env
 cd backend
-python -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements-dev.txt
-cp .env.example .env
 ```
 
-On Windows, activate with `.venv\Scripts\Activate.ps1`. Edit the local `.env` before starting: choose a development database and a private `SECRET_KEY`. Never commit this file or point verification at production data.
+Edit the private `.env` before startup: choose an explicitly authorized development database, private `SECRET_KEY`, `AUTO_BOOTSTRAP=0` unless initialization is approved, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` if creating the first administrator. Never commit this file. The bootstrap helper downloads only the checksum-pinned official pip wheel into the ignored output directory; it does not initialize a database. The reviewed native build constraints are build-only; see [native runtime details](docs/production-runtime.md).
 
 **Startup can write to the database.** The existing `AUTO_BOOTSTRAP` default applies migrations and creates baseline departments/an initial admin on an empty database. Use that only for an explicitly authorized local database. Set `AUTO_BOOTSTRAP=0` when automatic initialization must be disabled. The `seed` CLI drops and recreates the demo database; it is deliberately excluded from this quick start. Existing accounts are not assumed to exist, and no credentials are published here.
 
@@ -76,7 +76,7 @@ npm ci
 npm run dev
 ```
 
-Open `http://localhost:5173`. Vite proxies `/api` to `http://127.0.0.1:5000` by default. Use accounts authorized for your chosen development environment. A newly initialized local database's bootstrap account must be handled privately through the existing bootstrap process; do not include its credential output in screenshots or reports.
+Open `http://localhost:5173`. Vite proxies `/api` to `http://127.0.0.1:5000` by default. Use accounts authorized for your chosen development environment. New initial administrator provisioning requires the private configured password; passwords are not generated or printed by that command. Keep all credentials out of screenshots and reports.
 
 To compile the frontend locally:
 
@@ -89,7 +89,7 @@ This produces `web/dist`; it does not deploy the application. [Development detai
 
 ## Environment configuration
 
-No environment variables are mandatory for the default development SQLite configuration. `SECRET_KEY` is mandatory in production; database selection and bootstrap behavior should be reviewed before any local startup. Names below are the existing application contracts and retain their internal TaskForge identifiers.
+`SECRET_KEY` is mandatory in production, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` is required for a new initial administrator. Production workers require reviewed `DATABASE_URL` and `AUTO_BOOTSTRAP=0`; inspect database selection before any startup. Names below are the existing application contracts and retain their internal TaskForge identifiers.
 
 | Variables | Purpose |
 | --- | --- |
@@ -124,17 +124,14 @@ ruff check .
 pytest -q --cov=task_management --cov-report=term-missing
 ```
 
-Verification on **2026-11-04**: frontend typecheck/build passed; **27 frontend tests across 3 files passed**; **89 backend tests passed with 77% coverage**; Ruff passed. The backend suite uses fresh **in-memory SQLite** through Flask's test client, not a running server or configured development database. PostgreSQL/MySQL behavior was not exercised.
+Accepted local security work on **2026-11-05** includes **136 backend tests (82% coverage)**, **82 frontend tests**, TypeScript/build/Ruff, real isolated PostgreSQL integration and least-privilege roles, and actual production HTTPS/browser verification. Ordinary backend tests use Flask test clients and in-memory SQLite; the PostgreSQL and HTTPS campaigns are separate evidence. The selected screenshot gallery remains mock-data captures.
 
-Final browser review uses fictional API fixtures for representative screens, themes, viewports, error displays and keyboard behavior. Prior management/task workflow checks were also mocked. **Live sign-in, database persistence, cross-department HTTP enforcement, and actual audit persistence remain blocked:** no authorized development configuration, database or test accounts were supplied. No database was initialized, migrated, reset or seeded for this pass.
-
-Existing `npm audit` checks report **9 affected package entries**: 2 critical, 2 high and 5 moderate. The runtime-only audit reports **2 moderate entries**. These counts include transitive/parent package entries and are not distinct exploitable application flaws. Versions were not upgraded; applicability and remediation require separate review. No Python vulnerability scanner is configured, so this pass does not certify Python dependency security.
+The accepted image has zero reported installed Python and npm full/runtime audit findings at the recorded snapshot. Its OS/native scan still reports **51 High package entries across 13 High IDs**, plus six Unknown IDs and an inactive ensurepip pip archive with six disclosed advisories. These are not owner-approved residual risks. [Verification](docs/VERIFICATION.md), [release policy](docs/release-assurance.md) and the [decision register](docs/security-decisions.json) distinguish historical acceptance, local CI-equivalent checks and remaining release gates. Hosted GitHub Actions has **not** been verified.
 
 ## Limitations and readiness
 
-**CONDITIONAL** portfolio/publication readiness: visual customization and documentation are complete, but live backend verification and security remediation remain outstanding. The subsequent technical preflight rates the current production configuration **NOT READY for public deployment**, including its vulnerable Gunicorn pin. See the [verification summary](docs/VERIFICATION.md). This is not deployment approval or a security certification.
+**CONDITIONAL release readiness.** Security fixes and local integration evidence are available, but public deployment remains blocked on explicit residual-risk disposition, hosted CI on the reviewed source, and hosted ingress/database/recovery checks. Local acceptance is not public-deployment approval or security certification. The modal return-focus defect was corrected and regression-tested in Stage 2D.
 
-- The inherited modal return-focus issue reproduced in all 20 final keyboard-probe cycles; shared focus-management behavior was deliberately not changed.
 - Native drag-and-drop has no separate touch or keyboard implementation.
 - Dense tables and Kanban columns scroll inside their containers on smaller screens.
 - Board and list filters are independent; some screens have no pagination controls.

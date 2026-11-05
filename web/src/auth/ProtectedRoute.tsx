@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 
 import type { Permission } from "../api/types";
@@ -12,10 +13,19 @@ import { landingFor, useAuth } from "./AuthContext";
 export function ProtectedRoute({ permission }: { permission?: Permission }) {
   const { user, isLoading, can } = useAuth();
   const location = useLocation();
+  const authenticatedDoor = can("console.access") ? "/admin/login" : "/login";
+  const lastAuthenticatedDoor = useRef<typeof authenticatedDoor | null>(null);
+
+  // Logout clears the auth cache before its caller navigates. Keep that
+  // transition pointed at the same login door, including on workspace pages.
+  useEffect(() => {
+    if (user) lastAuthenticatedDoor.current = authenticatedDoor;
+  }, [user, authenticatedDoor]);
 
   if (isLoading) return <FullPageSpinner />;
   if (!user) {
-    const door = location.pathname.startsWith("/admin") ? "/admin/login" : "/login";
+    const door = lastAuthenticatedDoor.current ??
+      (location.pathname.startsWith("/admin") ? "/admin/login" : "/login");
     return <Navigate to={door} replace state={{ from: location.pathname }} />;
   }
   if (permission && !can(permission)) return <Navigate to={landingFor(user)} replace />;

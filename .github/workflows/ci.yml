@@ -5,103 +5,227 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: read
+
 concurrency:
-  # A new push supersedes the run already in flight for the same branch.
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  DOCKER_BUILD_RECORD_UPLOAD: "false"
+
 jobs:
   backend:
-    name: Backend (pytest)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: backend
-
+    name: Backend, native build and installed dependency audit
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: backend/requirements-dev.txt
-
-      - name: Install dependencies
-        run: pip install -r requirements-dev.txt
-
-      - name: Lint
-        run: ruff check .
-
-      - name: Test
-        # The suite runs against in-memory SQLite, so CI needs no database
-        # service container and the whole job stays under a minute.
-        run: pytest -q --cov=task_management --cov-report=term-missing
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12.16"
+      - name: Verify native build prerequisites
+        run: |
+          gcc --version
+          pg_config --version
+          test -f "$(pg_config --includedir)/libpq-fe.h"
+          python -c 'import sysconfig,pathlib; assert (pathlib.Path(sysconfig.get_path("include"))/"Python.h").is_file()'
+      - name: Create isolated patched-pip environment
+        run: |
+          python tools/ci/python_env.py "$RUNNER_TEMP/backend-env" --wheel "$RUNNER_TEMP/pip-26.3-py3-none-any.whl" --download
+          echo "$RUNNER_TEMP/backend-env/bin" >> "$GITHUB_PATH"
+      - name: Install unchanged application and test requirements
+        run: |
+          python -m pip install --build-constraint tools/ci/build-constraints.txt -r backend/requirements-dev.txt
+          python -m pip check
+          python -c 'import psycopg; assert psycopg.pq.__impl__ == "c"; print("Psycopg-C libpq", psycopg.pq.version())'
+      - name: Backend Ruff and full SQLite suite
+        working-directory: backend
+        run: |
+          ruff check --no-cache .
+          pytest -q --cov=task_management --cov-report=term-missing
+      - name: Release-helper policy tests and lint
+        run: |
+          python -m unittest discover -s tools/ci/tests -v
+          ruff check --no-cache --config backend/ruff.toml tools/ci
+      - name: Audit actual installed app and development inventory
+        run: |
+          mkdir -p output/ci/backend
+          python -m pip list --format=json > output/ci/backend/installed.json
+          python tools/ci/release_checks.py requirements output/ci/backend/installed.json output/ci/backend/installed.txt
+          python tools/ci/python_env.py "$RUNNER_TEMP/audit-env" --wheel "$RUNNER_TEMP/pip-26.3-py3-none-any.whl"
+          "$RUNNER_TEMP/audit-env/bin/python" -m pip install -r tools/ci/audit-requirements.txt
+          "$RUNNER_TEMP/audit-env/bin/pip-audit" --disable-pip --no-deps -r output/ci/backend/installed.txt -f json -o output/ci/backend/python-audit.json
+          python tools/ci/release_checks.py audit output/ci/backend/installed.json output/ci/backend/python-audit.json
+      - name: Validate workflow with verified actionlint
+        run: |
+          python tools/ci/fetch_tools.py tool actionlint "$RUNNER_TEMP/ci-tools"
+          "$RUNNER_TEMP/ci-tools/actionlint" -color .github/workflows/ci.yml
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: backend-security-evidence
+          path: output/ci/backend/
+          retention-days: 14
 
   frontend:
-    name: Frontend (typecheck, vitest, build)
-    runs-on: ubuntu-latest
+    name: Frontend quality and full/runtime dependency audits
+    runs-on: ubuntu-24.04
     defaults:
       run:
         working-directory: web
-
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
         with:
-          node-version: "20"
+          persist-credentials: false
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version: "24.21.0"
           cache: npm
           cache-dependency-path: web/package-lock.json
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Test
-        run: npm run test
-
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run test
+      - run: npm run build
+      - name: Preserve both audit results; fail on either finding or tool error
+        shell: bash
+        run: |
+          mkdir -p ../output/ci/frontend
+          full=0
+          runtime=0
+          npm audit --json > ../output/ci/frontend/npm-full.json || full=$?
+          npm audit --omit=dev --json > ../output/ci/frontend/npm-runtime.json || runtime=$?
+          test "$full" -eq 0 && test "$runtime" -eq 0
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: frontend-security-evidence
+          path: output/ci/frontend/
+          retention-days: 14
 
   docker:
-    name: Docker image builds
-    runs-on: ubuntu-latest
-    # Catches a broken Dockerfile here rather than on the deploy that follows.
+    name: Same-image build, PostgreSQL smoke and security regression
+    runs-on: ubuntu-24.04
     needs: [backend, frontend]
-
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: docker/setup-buildx-action@v3
-
-      - uses: docker/build-push-action@v6
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12.16"
+      - name: Capture clean source identity
+        id: source
+        run: |
+          python tools/ci/release_checks.py source output/ci/image/source.json --require-clean
+          python -c 'import json,os; d=json.load(open("output/ci/image/source.json")); assert d["commit"]==os.environ["GITHUB_SHA"]; print("scope="+d["security_scope_sha256"])' >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4
+      - uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7
+        id: build
         with:
           context: .
+          platforms: linux/amd64
           push: false
           load: true
-          tags: taskforge:ci
+          tags: crewflow:ci
+          provenance: mode=min
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            io.crewflow.security-scope=${{ steps.source.outputs.scope }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-      - name: Smoke test the image
+      - name: Preserve unsigned BuildKit metadata
+        env:
+          BUILD_METADATA: ${{ steps.build.outputs.metadata }}
+        run: python -c 'import json,os,pathlib; pathlib.Path("output/ci/image/build-metadata.json").write_text(json.dumps(json.loads(os.environ["BUILD_METADATA"]),indent=2))'
+      - name: Preserve liveness smoke (no bootstrap/database initialization)
         run: |
-          docker run -d --name taskforge -p 8000:8000 \
-            -e APP_ENV=production \
-            -e SECRET_KEY=ci-only-not-a-real-secret \
-            -e DATABASE_URL=sqlite:///ci.db \
-            taskforge:ci
-
+          key=$(python -c 'import secrets; print(secrets.token_hex(32))')
+          echo "::add-mask::$key"
+          export SECRET_KEY="$key"
+          docker run -d --name crewflow-ci-health -p 127.0.0.1:8000:8000 \
+            -e APP_ENV=production -e SECRET_KEY -e DATABASE_URL=sqlite:// -e AUTO_BOOTSTRAP=0 crewflow:ci
+          healthy=0
           for attempt in $(seq 1 30); do
-            if curl -fsS http://localhost:8000/api/healthz; then
-              echo "\nContainer is healthy"
-              exit 0
-            fi
+            if curl -fsS http://127.0.0.1:8000/api/healthz; then healthy=1; break; fi
             sleep 2
           done
+          test "$healthy" -eq 1
+      - name: Fresh PostgreSQL 17 migrator/runtime smoke
+        run: |
+          python tools/ci/postgres_smoke.py run --image crewflow:ci \
+            --output output/ci/image/postgres --private-parent "$RUNNER_TEMP"
+      - name: Inventory and bind the exact built image/archive
+        run: |
+          docker run --rm --network none --entrypoint python crewflow:ci -m pip list --format=json > output/ci/image/python-installed.json
+          python tools/ci/release_checks.py requirements output/ci/image/python-installed.json output/ci/image/python-installed.txt
+          docker run --rm --network none --entrypoint dpkg-query crewflow:ci -W > output/ci/image/os-packages.txt
+          docker run --rm --network none --entrypoint python crewflow:ci -m pip check
+          docker run --rm --network none --entrypoint python crewflow:ci -c 'import importlib.util,psycopg; assert importlib.util.find_spec("setuptools") is None; assert psycopg.pq.__impl__=="c"; print("Psycopg-C",psycopg.__version__,"libpq",psycopg.pq.version())' > output/ci/image/native-identity.txt
+          docker image save -o "$RUNNER_TEMP/candidate.tar" crewflow:ci
+          python tools/ci/release_checks.py image crewflow:ci "$RUNNER_TEMP/candidate.tar" output/ci/image/source.json output/ci/image/image.json --require-labels
+      - name: Audit actual installed runtime Python inventory
+        run: |
+          python tools/ci/python_env.py "$RUNNER_TEMP/audit-env" --wheel "$RUNNER_TEMP/pip-26.3-py3-none-any.whl" --download
+          "$RUNNER_TEMP/audit-env/bin/python" -m pip install -r tools/ci/audit-requirements.txt
+          "$RUNNER_TEMP/audit-env/bin/pip-audit" --disable-pip --no-deps -r output/ci/image/python-installed.txt -f json -o output/ci/image/python-audit.json
+          python tools/ci/release_checks.py audit output/ci/image/python-installed.json output/ci/image/python-audit.json
+      - name: Verify scanner and obtain one fresh official database
+        run: |
+          python tools/ci/fetch_tools.py tool trivy "$RUNNER_TEMP/scanner"
+          python tools/ci/fetch_tools.py db "$RUNNER_TEMP/scanner/trivy" "$RUNNER_TEMP/trivy-cache"
+          "$RUNNER_TEMP/scanner/trivy" --version > output/ci/image/scanner-version.txt
+          cp "$RUNNER_TEMP/scanner/trivy-integrity.json" output/ci/image/
+          python tools/ci/release_checks.py db "$RUNNER_TEMP/trivy-cache" output/ci/image/scanner-db.json
+      - name: Scan exact archive without feed updates or finding suppression
+        run: |
+          "$RUNNER_TEMP/scanner/trivy" image --input "$RUNNER_TEMP/candidate.tar" \
+            --cache-dir "$RUNNER_TEMP/trivy-cache" --scanners vuln --pkg-types os,library \
+            --skip-db-update --skip-java-db-update --skip-version-check --skip-vex-repo-update \
+            --offline-scan --no-progress --list-all-pkgs --format json --output output/ci/image/trivy.json
+      - name: Fail on new, changed or escalated material findings
+        run: |
+          python tools/ci/release_checks.py check output/ci/image/trivy.json docs/security-decisions.json \
+            output/ci/image/source.json output/ci/image/image.json output/ci/image/scanner-db.json output/ci/image/regression-policy.json
+      - name: Hash sanitized evidence only
+        if: always()
+        run: |
+          find output/ci/image -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 -r sha256sum > output/ci/image/SHA256SUMS
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: release-image-evidence
+          path: output/ci/image/
+          retention-days: 14
+      - name: Remove only ephemeral CI liveness container
+        if: always()
+        run: docker rm -f crewflow-ci-health || true
 
-          echo "Container never became healthy:"
-          docker logs taskforge
-          exit 1
+  release-readiness:
+    name: Owner review required before release
+    runs-on: ubuntu-24.04
+    needs: [docker]
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12.16"
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        with:
+          name: release-image-evidence
+          path: output/ci/image
+      - name: Fail closed on pending, expired or unreviewed residual risk
+        run: |
+          python tools/ci/release_checks.py check output/ci/image/trivy.json docs/security-decisions.json \
+            output/ci/image/source.json output/ci/image/image.json output/ci/image/scanner-db.json output/ci/image/release-policy.json --release
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: release-clearance-decision
+          path: output/ci/image/release-policy.json
+          retention-days: 14

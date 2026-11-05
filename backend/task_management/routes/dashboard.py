@@ -1,8 +1,9 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 
 from ..auth_decorators import permission_required
 from ..extensions import db
 from ..models import Department, Employee, Task, TaskAssignment
+from ..permissions import can
 from ..services import activity_service
 
 dashboard_bp = Blueprint("dashboard", __name__)
@@ -39,7 +40,9 @@ def stats():
                 "completion_rate": completion_rate,
                 "by_status": by_status,
             },
-            "recent_activity": activity_service.list_recent(10),
+            "recent_activity": (
+                activity_service.list_recent(10) if can(g.current_user.role, "audit.view") else []
+            ),
         }
     )
 

@@ -1,173 +1,31 @@
-<div align="center">
+# CrewFlow deployment preparation
 
-# 🚀 Deployment
+**CONDITIONAL — not public-deployment approval.** No hosting provider, cloud resources, remote image publication or deployment is configured by the release-assurance stage. The user performs all GitHub operations personally.
 
-**[← Back to README](README.md)** · [Architecture](docs/ARCHITECTURE.md) · [Security](docs/SECURITY.md) · [API](docs/API.md) · [Development](docs/DEVELOPMENT.md) · [Screenshots](docs/SCREENSHOTS.md)
+CrewFlow supports the existing simple pattern: one linux/amd64 Flask/Gunicorn container serving the compiled React SPA and API behind HTTPS, with durable PostgreSQL. Keep the database-provider and application-hosting decisions separate. No free-tier, pricing, resource-limit or backup entitlement is assumed; verify official provider terms when choosing a host.
 
-</div>
+## Release prerequisites
 
----
+Read [production runtime](docs/production-runtime.md) for exact native build/APT order, configuration, least-privilege roles and controlled migration commands. Read [release assurance](docs/release-assurance.md) for the source/image/scan evidence chain and CI policy.
 
-The app ships as a single container: Node builds the React bundle, then a slim
-Python image serves both that bundle and the API through Gunicorn. Any host
-that can run a Dockerfile can run it.
+The accepted local image is `crewflow:stage2e4d`, ID `sha256:9ac32692050df355acf426999511a5e5e9aaf393279997a37c7f4ed8edd26cb6`. It passed isolated PostgreSQL, HTTPS and browser checks. Its source includes uncommitted changes; an older Git checkout will not contain all fixes. This baseline is not proof of a future hosted build or bit-for-bit reproducibility.
 
----
+Before public deployment:
 
-## Why the previous Railway deploy stopped working
+- The user reviews and publishes all accepted source/test/build fixes and new CI helpers/docs, preserving MIT and complete third-party notices. Do not publish diagnostic archives, databases, private `.env` files, keys, browser cookies or backups.
+- Hosted GitHub Actions must actually run on the reviewed commit. Local equivalent checks do not establish hosted success. Select the exact scanned image/config/layers and retain source/build/scan evidence beyond CI artifact expiry.
+- Obtain explicit owner decisions or corrections for all material residual advisories. The [register](docs/security-decisions.json) has 13 High IDs and six Unknown IDs pending, plus the inactive pip archive. CI's release gate remains deliberately blocked; installed Python/npm zero findings do not clear OS packages.
+- Review capacity, supported PostgreSQL/region/TLS, durable storage, connection budget, ingress topology, health probes, backups, retention, recovery and rollback with the selected host. Use no production credentials in pull-request CI.
 
-The old URL returns `{"status":"error","code":404,"message":"Application not found"}`.
-That is Railway's edge saying **the service no longer exists** — it is not a
-build failure or a crash loop. Railway's trial credit expires and the project
-is removed with it. Redeploying the old configuration would not have helped,
-because nothing was left to redeploy into.
+## Controlled execution sequence for a later authorized stage
 
-Two things in the old setup would also have broken a fresh deploy:
+1. Establish the reviewed source revision and image identity. Build/scan that candidate using the existing Dockerfile; do not retag an old vulnerable image as a release.
+2. Provision an explicitly approved durable PostgreSQL target. Use separate setup, non-superuser migrator and restricted runtime roles. Require verified database TLS and network restrictions. Confirm identity before writes.
+3. Arrange backup/recovery and run existing migrations once as migrator with `AUTO_BOOTSTRAP=0`; confirm head `b7c1e2d4a9f0`. Apply narrowly scoped runtime object grants. Never run the destructive demo seed or reset preserved data.
+4. Provision the initial Super Admin once using the existing `create-admin` command and private explicit bootstrap password. This is a separate bounded write operation, not an ordinary startup action. No passwords belong in logs/docs/screenshots.
+5. Configure stable private session key, explicit production/runtime database settings and disabled automatic bootstrap. Do not provide workers with migrator/setup credentials or bootstrap passwords.
+6. Start the non-root Gunicorn container behind HTTPS. Set exact trusted proxy peers for that real topology; never wildcard scheme trust. Secure/HttpOnly/SameSite cookies, CSRF, restrictive CSP and API no-store must remain active.
+7. Verify actual hosted liveness/readiness, nested-route refresh, fonts/notices, protected/unauthenticated requests, role/department denials, login/logout and persisted task/audit behavior. Test Admin logout reaches `/admin/login` and employee logout `/login`.
+8. Verify restore and rollback procedures. An application rollback must remain compatible with the migrated schema; do not automatically downgrade the database. Retain the prior image and approved backup, and define operator recovery actions before public access.
 
-1. **Postgres was unsupported.** `config.py` only rewrote `mysql://`. Railway
-   and Render both hand out `postgres://`, which SQLAlchemy 2 rejects outright
-   (`Can't load plugin: sqlalchemy.dialects:postgres`) — a crash at boot, before
-   the first request. That normalisation is now pinned by `test_config.py`.
-2. **A fresh database had no departments.** Signup requires picking one, and
-   the picker is populated from the database, so nobody could create the first
-   account. First boot now seeds departments and an admin.
-
----
-
-## Option 1 — Render (recommended)
-
-Free web service, free managed Postgres, and `render.yaml` already describes
-both.
-
-1. Push this repository to GitHub.
-2. In Render: **New → Blueprint**, select the repo.
-3. Render reads `render.yaml`, creates the web service and the database, and
-   wires `DATABASE_URL` between them. `SECRET_KEY` is generated once and held
-   constant across deploys.
-4. Open the deploy log and find the line beginning `BOOTSTRAP ADMIN CREATED` —
-   it prints the generated admin password **once**. Sign in and change it.
-
-To choose your own password instead, set `BOOTSTRAP_ADMIN_PASSWORD` in the
-service's environment before the first deploy.
-
-> **Free tier caveats.** The service sleeps after ~15 minutes idle, so the
-> first request afterwards takes 30–60s. Render's free Postgres expires after
-> 30 days — for a demo link that has to stay alive, point `DATABASE_URL` at a
-> [Neon](https://neon.tech) free database instead, which does not expire, and
-> delete the `databases:` block from `render.yaml`.
-
----
-
-## Option 2 — Railway
-
-1. **New Project → Deploy from GitHub repo.**
-2. **New → Database → PostgreSQL.** Railway injects `DATABASE_URL` into the
-   web service automatically.
-3. Set these variables on the web service:
-
-   | Variable | Value |
-   |---|---|
-   | `SECRET_KEY` | `python -c "import secrets; print(secrets.token_hex(32))"` |
-   | `APP_ENV` | `production` |
-   | `BOOTSTRAP_ADMIN_PASSWORD` | your choice (optional) |
-
-4. Deploy. `railway.toml` selects the Dockerfile and points the health check at
-   `/api/healthz`.
-
----
-
-## Option 3 — Fly.io
-
-```bash
-fly launch --no-deploy            # detects the Dockerfile
-fly postgres create               # then: fly postgres attach <name>
-fly secrets set SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')" APP_ENV=production
-fly deploy
-```
-
-Fly's free allowance does not expire, which makes it the best choice if the
-demo link needs to stay up indefinitely.
-
----
-
-## Option 4 — Any Docker host
-
-```bash
-docker build -t taskforge .
-
-docker run -d -p 8000:8000 \
-  -e APP_ENV=production \
-  -e SECRET_KEY="$(python -c 'import secrets; print(secrets.token_hex(32))')" \
-  -e DATABASE_URL="postgresql://user:pass@host:5432/taskforge" \
-  taskforge
-```
-
----
-
-## Environment variables
-
-| Variable | Required | Default | Notes |
-|---|:---:|---|---|
-| `SECRET_KEY` | **in production** | — | The app refuses to boot without it. A rotating key signs every visitor out on each restart. |
-| `APP_ENV` | | `development` | `production` turns on secure cookies and HSTS. |
-| `DATABASE_URL` | | SQLite file | `postgres://`, `postgresql://` and `mysql://` are all normalised to the installed driver. |
-| `BOOTSTRAP_ADMIN_USERNAME` | | `admin` | |
-| `BOOTSTRAP_ADMIN_PASSWORD` | | random | Generated and logged once if unset. |
-| `AUTO_BOOTSTRAP` | | `1` | Set `0` to manage the schema entirely by hand. |
-| `WEB_CONCURRENCY` | | `2` | Gunicorn workers. |
-| `MAX_FAILED_LOGINS` | | `5` | |
-| `LOCKOUT_MINUTES` | | `15` | |
-| `MIN_PASSWORD_LENGTH` | | `8` | |
-| `PORT` | | `8000` | Injected by most hosts. |
-
-Never set `DATABASE_URL` to a SQLite file on a host with an ephemeral
-filesystem — every deploy would wipe the data.
-
----
-
-## First boot
-
-On an empty database the app:
-
-1. applies Alembic migrations (or `create_all()` if `migrations/` is absent),
-2. creates the five default departments,
-3. creates one admin account and logs the password if it generated one.
-
-Every step is idempotent, so it is safe on each restart and a no-op once the
-database is populated.
-
----
-
-## Health checks
-
-| Endpoint | Purpose |
-|---|---|
-| `/api/healthz` | Liveness. Touches nothing, so it answers even when the database is down. |
-| `/api/readyz` | Readiness. Round-trips `SELECT 1`; returns **503** if the database is unreachable. |
-
-Point a platform health check at `/api/healthz`. Gating on `/readyz` would make
-the platform kill and restart the container during a database blip, which does
-not help and turns a brief outage into a restart loop.
-
----
-
-## Troubleshooting
-
-**`Can't load plugin: sqlalchemy.dialects:postgres`** — an old build without URL
-normalisation. Fixed in `config.py`; confirm with `pytest tests/test_config.py`.
-
-**`RuntimeError: SECRET_KEY must be set in production`** — working as intended.
-Set it.
-
-**Signup shows an empty department dropdown** — bootstrap did not run. Check the
-boot log for `Bootstrap skipped — database not ready`, which means
-`DATABASE_URL` is wrong or the database was not reachable at start.
-
-**Everyone is signed out after each deploy** — `SECRET_KEY` is changing between
-deploys. Set it once as a fixed secret.
-
-**`/api/readyz` returns 503** — the app is up, the database is not. Check the
-connection string, and whether the provider requires `?sslmode=require`.
-
-**First request takes 30–60 seconds** — a free-tier container waking from
-sleep. Not a bug.
+No command here grants permission to mutate a local or hosted database. Local test resources are separate from production, and their credentials must never be copied to a public service.

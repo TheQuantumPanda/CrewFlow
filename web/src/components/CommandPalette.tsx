@@ -67,7 +67,8 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         group: "Actions",
         icon: MoveUp,
         run: () => {
-          void logout().then(() => navigate("/login", { replace: true }));
+          const door = can("console.access") ? "/admin/login" : "/login";
+          void logout().then(() => navigate(door, { replace: true }));
         },
       });
     }

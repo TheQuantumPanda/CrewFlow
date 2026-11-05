@@ -59,3 +59,26 @@ def test_unknown_api_route_returns_json_not_html(client):
     response = client.get("/api/does-not-exist")
     assert response.status_code == 404
     assert response.is_json
+
+
+def test_api_responses_are_not_cacheable(client, as_employee):
+    for path, status in (("/api/healthz", 200), ("/api/readyz", 200),
+                         ("/api/missing", 404), ("/api/auth/me", 401)):
+        response = client.get(path)
+        assert response.status_code == status
+        assert response.headers["Cache-Control"] == "no-store"
+    response = as_employee.get("/api/auth/me")
+    assert response.status_code == 200
+    assert response.headers["Cache-Control"] == "no-store"
+
+
+def test_api_cache_policy_does_not_override_static_files(client, tmp_path, monkeypatch):
+    import task_management
+
+    (tmp_path / "index.html").write_text("<title>CrewFlow</title>")
+    (tmp_path / "asset.js").write_text("/* static */")
+    monkeypatch.setattr(task_management, "SPA_DIST", str(tmp_path))
+    for path in ("/", "/login", "/asset.js"):
+        response = client.get(path)
+        assert response.status_code == 200
+        assert response.headers["Cache-Control"] == "no-cache"

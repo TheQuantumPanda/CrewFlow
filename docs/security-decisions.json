@@ -1,0 +1,854 @@
+{
+  "schema_version": 1,
+  "baseline_image": "crewflow:stage2e4d",
+  "baseline_image_id": "sha256:9ac32692050df355acf426999511a5e5e9aaf393279997a37c7f4ed8edd26cb6",
+  "security_scope_sha256": "111e00878ae335947e4b834e058b0ff50277e38f6ac4486af1064224c34638c9",
+  "platform": "linux/amd64",
+  "distribution": "Debian 13 trixie",
+  "policy": "No owner risk acceptance supplied. All Critical block; material new/changed findings fail regression; public release also requires explicit unexpired owner decisions for every listed material/manual issue.",
+  "decisions": [
+    {
+      "id": "CVE-2025-47273",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "lang-pkgs",
+          "name": "setuptools",
+          "type": "python-pkg",
+          "version": "70.3.0"
+        }
+      ],
+      "component": "setuptools: Path Traversal Vulnerability in setuptools PackageIndex",
+      "vulnerable_feature_or_precondition": "setuptools PackageIndex download handling",
+      "crewflow_applicability": "Scanner attributes pkg_resources vendored subset in pip; full setuptools/package_index absent and cannot import.",
+      "vendor_correction": [
+        "78.1.1"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2025-47273",
+        "https://github.com/pypa/setuptools/security/advisories/GHSA-5rjg-fvgr-3xxf"
+      ],
+      "recommendation": "Propose source-subset not-applicable review; preserve raw attribution.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "setuptools is a package that allows users to download, build, install, upgrade, and uninstall Python packages. A path traversal vulnerability in `PackageIndex` is present in setuptools prior to version 78.1.1. An attacker would be allowed to write files to arbitrary locations on the filesystem with the permissions of the process running the Python code, which could escalate to remote code execution depending on the context. Version 78.1.1 fixes the issue."
+    },
+    {
+      "id": "CVE-2025-69720",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libncursesw6",
+          "type": "debian",
+          "version": "6.5+20250216-2"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libtinfo6",
+          "type": "debian",
+          "version": "6.5+20250216-2"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "ncurses-base",
+          "type": "debian",
+          "version": "6.5+20250216-2"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "ncurses-bin",
+          "type": "debian",
+          "version": "6.5+20250216-2"
+        }
+      ],
+      "component": "ncurses: ncurses: Buffer overflow vulnerability may lead to arbitrary code execution.",
+      "vulnerable_feature_or_precondition": "ncurses infocmp/untrusted terminal descriptions",
+      "crewflow_applicability": "infocmp is present but not invoked by application; arbitrary shell execution is not an application feature.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2025-69720",
+        "https://security-tracker.debian.org/tracker/CVE-2025-69720"
+      ],
+      "recommendation": "Track vendor correction; no automatic not-applicable determination.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "The infocmp command-line tool in ncurses before 6.5-20251213 has a stack-based buffer overflow in analyze_string in progs/infocmp.c.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119371",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that al ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that allows attackers to bypass the SQLITE_LIMIT_EXPR_DEPTH nesting limit because common table expressions are not counted against it. Attackers can supply a WITH clause chaining tens of thousands of CTEs, via plain SQL or a view in an untrusted database file, causing unbounded selectExpander() recursion that crashes the process.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119371",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119371"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that allows attackers to bypass the SQLITE_LIMIT_EXPR_DEPTH nesting limit because common table expressions are not counted against it. Attackers can supply a WITH clause chaining tens of thousands of CTEs, via plain SQL or a view in an untrusted database file, causing unbounded selectExpander() recursion that crashes the process.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119372",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 built with FTS3/FTS4 and SQLITE_ENABLE_FTS3_PAREN ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 built with FTS3/FTS4 and SQLITE_ENABLE_FTS3_PARENTHESIS contains a use-after-free vulnerability in fts3BestSnippet() caused by dangling cached position-list pointers. Attackers can run a full-text MATCH query combining OR and NEAR operators with snippet() to read freed heap memory and crash the process.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119372",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119372"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 built with FTS3/FTS4 and SQLITE_ENABLE_FTS3_PARENTHESIS contains a use-after-free vulnerability in fts3BestSnippet() caused by dangling cached position-list pointers. Attackers can run a full-text MATCH query combining OR and NEAR operators with snippet() to read freed heap memory and crash the process.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119373",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "sqlite: sqlite: Denial of service via heap-based buffer overflow in FTS5",
+      "vulnerable_feature_or_precondition": "SQLite FTS5 processing",
+      "crewflow_applicability": "Production uses PostgreSQL; application has no FTS workflow. SQLite remains available to Python.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119373",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119373"
+      ],
+      "recommendation": "Track vendor correction; proposed production-only bounded acceptance.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 built with FTS5 contains a heap buffer overflow in fts5MergeRowidLists() that undersizes the output buffer when merging detail=none prefix doclists. Attackers who can populate a detail=none FTS5 table with negative rowids and run a prefix MATCH query can write past the allocation, corrupting heap memory and crashing the process.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119374",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 built with FTS5 contains a heap buffer overflow i ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 built with FTS5 contains a heap buffer overflow in fts5DoSecureDelete() that allows attackers to write past the leaf page buffer via crafted footer key offsets. Attackers can supply a database file with a corrupted FTS5 index that, when deleted from with secure-delete enabled, corrupts heap memory and crashes the application.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119374",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119374"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 built with FTS5 contains a heap buffer overflow in fts5DoSecureDelete() that allows attackers to write past the leaf page buffer via crafted footer key offsets. Attackers can supply a database file with a corrupted FTS5 index that, when deleted from with secure-delete enabled, corrupts heap memory and crashes the application.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119375",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 contains an information disclosure vulnerability  ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 contains an information disclosure vulnerability that allows attackers to read uninitialized page-cache memory by supplying a WAL file with an undersized page size. Attackers can craft a database and WAL file whose oversized record payload makes queries like substr() return stale bytes, disclosing other table rows and internal pointers.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119375",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119375"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 contains an information disclosure vulnerability that allows attackers to read uninitialized page-cache memory by supplying a WAL file with an undersized page size. Attackers can craft a database and WAL file whose oversized record payload makes queries like substr() return stale bytes, disclosing other table rows and internal pointers.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119376",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that al ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that allows attackers to bypass the SQLITE_LIMIT_EXPR_DEPTH limit by chaining COLLATE postfix operators. Attackers can supply roughly 175,000 chained COLLATE operators in SQL or an untrusted database view to trigger unbounded recursion in sqlite3WalkExprNN() and crash the process.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119376",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119376"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 contains a stack exhaustion vulnerability that allows attackers to bypass the SQLITE_LIMIT_EXPR_DEPTH limit by chaining COLLATE postfix operators. Attackers can supply roughly 175,000 chained COLLATE operators in SQL or an untrusted database view to trigger unbounded recursion in sqlite3WalkExprNN() and crash the process.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-119379",
+      "severity": "UNKNOWN",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsqlite3-0",
+          "type": "debian",
+          "version": "3.46.1-7+deb13u2"
+        }
+      ],
+      "component": "SQLite before 3.54.0 built with the session extension contains a heap  ...",
+      "vulnerable_feature_or_precondition": "SQLite before 3.54.0 built with the session extension contains a heap buffer overflow vulnerability in sqlite3changeset_apply() that allows attackers to corrupt heap memory by supplying crafted changesets. Attackers can repeat a table name in a second changeset block with a larger column count, causing sessionUpdateFind() to memset past the undersized aUpdateMask allocation.",
+      "crewflow_applicability": "SQLite is installed; production uses PostgreSQL and has no FTS/session-extension workload. This does not remove the package.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-119379",
+        "https://security-tracker.debian.org/tracker/CVE-2026-119379"
+      ],
+      "recommendation": "Track supported vendor correction; owner must review uncertain severity and production scope.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "SQLite before 3.54.0 built with the session extension contains a heap buffer overflow vulnerability in sqlite3changeset_apply() that allows attackers to corrupt heap memory by supplying crafted changesets. Attackers can repeat a table name in a second changeset block with a larger column count, causing sessionUpdateFind() to memset past the undersized aUpdateMask allocation.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-12064",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "curl",
+          "type": "debian",
+          "version": "8.14.1-2+deb13u7"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libcurl4t64",
+          "type": "debian",
+          "version": "8.14.1-2+deb13u7"
+        }
+      ],
+      "component": "curl: curl: SSH host verification bypass when using schemeless URLs with SFTP/SCP",
+      "vulnerable_feature_or_precondition": "curl schemeless SFTP/SCP URL handling",
+      "crewflow_applicability": "Healthcheck uses fixed HTTP URL, not user-controlled SFTP/SCP URLs.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-12064",
+        "https://security-tracker.debian.org/tracker/CVE-2026-12064"
+      ],
+      "recommendation": "Track vendor correction; bounded feature-specific review.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "When a user invokes curl using a schemeless URL combined with\n`--proto-default` sftp (or scp), a disconnect occurs between the tool layer\nand libcurl. The tool layer incorrectly infers the URL scheme, which\nerroneously bypasses the initialization of critical SSH security options like\nCURLOPT_SSH_HOST_PUBLIC_KEY_SHA256 and CURLOPT_SSH_KNOWNHOSTS. Conversely, the\nlibcurl runtime successfully honors CURLOPT_DEFAULT_PROTOCOL and establishes\nthe connection via SFTP/SCP as specified. Because the tool layer skipped the\nsecurity configuration, these SSH host verification options are silently\nomitted, causing curl to connect to an unverified SSH remote host without\nthrowing an error.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-16742",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libsystemd0",
+          "type": "debian",
+          "version": "257.13-1~deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libudev1",
+          "type": "debian",
+          "version": "257.13-1~deb13u1"
+        }
+      ],
+      "component": "systemd: systemd-homed: Local privilege escalation via missing home-record signature verification",
+      "vulnerable_feature_or_precondition": "systemd-homed functionality",
+      "crewflow_applicability": "libsystemd/libudev are installed; systemd-homed executable/service absent.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-16742",
+        "https://security-tracker.debian.org/tracker/CVE-2026-16742"
+      ],
+      "recommendation": "Propose component-specific not-reachable review, pending owner.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "systemd-homed contains a local privilege escalation bug via arbitrary system group addition to a local, logged in, homed-managed user",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-54369",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "libacl1",
+          "type": "debian",
+          "version": "2.3.2-2+b1"
+        }
+      ],
+      "component": "acl: Symlink traversal privilege escalation via libacl functions",
+      "vulnerable_feature_or_precondition": "Privileged ACL processing",
+      "crewflow_applicability": "Non-root runtime has no application ACL manipulation; shared library remains.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-54369",
+        "https://security-tracker.debian.org/tracker/CVE-2026-54369"
+      ],
+      "recommendation": "Track vendor correction; owner capability/deployment review.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "acl before version 2.4.0 contains a symlink traversal vulnerability in the libacl pathname-based functions acl_get_file(), acl_set_file(), acl_extended_file(), and acl_delete_def_file() that allows local attackers to escalate privileges by replacing any pathname component with a symbolic link. Attackers who control any component of a pathname processed by a privileged caller can redirect ACL read or write operations to arbitrary files or directories, enabling unauthorized manipulation of access control lists and local privilege escalation.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-76642",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "bsdutils",
+          "type": "debian",
+          "version": "1:2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libblkid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "liblastlog2-2",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libmount1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libsmartcols1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libuuid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "login",
+          "type": "debian",
+          "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "mount",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "util-linux",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        }
+      ],
+      "component": "util-linux: util-linux: failed external mount helper still runs privileged X-mount post-hooks",
+      "vulnerable_feature_or_precondition": "Privileged external mount helper post-hooks",
+      "crewflow_applicability": "No privileged mounts/host filesystem or mount capability intended; shared util-linux attribution. Introduced-version inconsistencies remain in upstream data.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-76642",
+        "https://security-tracker.debian.org/tracker/CVE-2026-76642"
+      ],
+      "recommendation": "Track vendor correction; propose narrowly bounded acceptance only after mount/capability review.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "util-linux versions through 2.41.5 and 2.42.2 fail to check mount helper exit status before running post-mount hooks, allowing unprivileged users to execute privileged operations on pre-existing filesystems. Attackers can exploit X-mount.idmap or X-mount.owner hooks to clone filesystems with inherited suid bits or modify target inode permissions after a helper fails, achieving privilege escalation.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-76844",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "zlib1g",
+          "type": "debian",
+          "version": "1:1.3.dfsg+really1.3.1-1+b1"
+        }
+      ],
+      "component": "webpack-dev-middleware: webpack-dev-middleware: Information Disclosure via Path Traversal",
+      "vulnerable_feature_or_precondition": "zlib gz-write error path; scanner title conflicts with Debian zlib mapping",
+      "crewflow_applicability": "No identified direct application path, but transitive native use is not ruled out. Scanner webpack title conflicts with Debian zlib component.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-76844",
+        "https://security-tracker.debian.org/tracker/CVE-2026-76844"
+      ],
+      "recommendation": "Unresolved applicability; investigate upstream mapping/native consumers. Do not dismiss.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "zlib 1.2.11 through 1.3.2 contains a heap buffer overflow: after an underlying write() fails, gz_write() returns without resetting strm.next_in, leaving it pointed at the caller's buffer. A later gz* write call then derives a position from the stale pointer and writes past a heap allocation; any write() failure reaches it, including EPIPE on a blocking descriptor, and in versions before 1.3.1.2 the failed write must be followed by a gzclearerr() call.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-78408",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "bsdutils",
+          "type": "debian",
+          "version": "1:2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libblkid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "liblastlog2-2",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libmount1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libsmartcols1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libuuid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "login",
+          "type": "debian",
+          "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "mount",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "util-linux",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        }
+      ],
+      "component": "util-linux: util-linux: nsenter --join-cgroup leaks root cgroup migration authority",
+      "vulnerable_feature_or_precondition": "Privileged nsenter --join-cgroup retains a root-opened cgroup.procs descriptor across credential/namespace changes and exec.",
+      "crewflow_applicability": "CrewFlow does not invoke nsenter. Exploitation requires a privileged operator entering an attacker-controlled target; no host namespace/cgroup access is intended for the app. Do not treat this as a mount-only advisory.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-78408",
+        "https://security-tracker.debian.org/tracker/CVE-2026-78408"
+      ],
+      "recommendation": "Track; owner must review exact mount deployment constraints.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "The nsenter --join-cgroup option opens the target cgroup.procs file as root and leaves that file descriptor open across later namespace and credential changes and across execve(). Because the kernel checks later cgroup migrations using the credentials from the original open, a program run in an attacker-controlled target can inherit root's ability to move host processes between cgroups. After a privileged operator uses --join-cgroup against that target, an unprivileged user can migrate and terminate unrelated root processes.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-78409",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "bsdutils",
+          "type": "debian",
+          "version": "1:2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libblkid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "liblastlog2-2",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libmount1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libsmartcols1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libuuid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "login",
+          "type": "debian",
+          "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "mount",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "util-linux",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        }
+      ],
+      "component": "util-linux: util-linux: X-mount.subdir detached-tree resolution can escape via intermediate symlinks",
+      "vulnerable_feature_or_precondition": "fstab-authorized X-mount.subdir, detached-tree path on Linux 6.15+, intermediate symlink escape.",
+      "crewflow_applicability": "Accepted image has no configured fstab mounts and runs non-root without an application mount workflow. Future host capabilities/bind mounts require renewed review.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-78409",
+        "https://security-tracker.debian.org/tracker/CVE-2026-78409"
+      ],
+      "recommendation": "Track; propose bounded deployment-specific acceptance.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "The X-mount.subdir option uses a detached-tree fast path on Linux 6.15 and later and passes the configured subdirectory to open_tree() with AT_SYMLINK_NOFOLLOW. That flag does not stop intermediate symlink traversal or keep resolution inside the newly mounted filesystem. A local unprivileged user with an fstab-authorized X-mount.subdir entry can attach a host path at the intended mountpoint.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-78410",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "bsdutils",
+          "type": "debian",
+          "version": "1:2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libblkid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "liblastlog2-2",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libmount1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libsmartcols1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libuuid1",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "login",
+          "type": "debian",
+          "version": "1:4.16.0-2+really2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "mount",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "util-linux",
+          "type": "debian",
+          "version": "2.41.5-0+deb13u1"
+        }
+      ],
+      "component": "util-linux: util-linux: restricted bind mounts do not pin the source, allowing X-mount.owner/group/mode redirection",
+      "vulnerable_feature_or_precondition": "Restricted SUID bind mount with replaceable fstab source/ancestor plus X-mount.owner/group/mode hooks.",
+      "crewflow_applicability": "Accepted image has no configured fstab mount entries and the application does not execute mount. Privileged host/container changes would invalidate that assessment.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-78410",
+        "https://security-tracker.debian.org/tracker/CVE-2026-78410"
+      ],
+      "recommendation": "Track; review capabilities and supported vendor updates.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "A flaw was found in util-linux. Restricted bind mounts take the source path from fstab but do not pin that source before the privileged mount. A local unprivileged user who can replace the authorized source or a writable ancestor can redirect SUID mount(8) to bind another host directory. If the fstab entry also sets X-mount.owner, X-mount.group, or X-mount.mode, root then changes ownership or mode on that redirected inode.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-8458",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "curl",
+          "type": "debian",
+          "version": "8.14.1-2+deb13u7"
+        },
+        {
+          "class": "os-pkgs",
+          "name": "libcurl4t64",
+          "type": "debian",
+          "version": "8.14.1-2+deb13u7"
+        }
+      ],
+      "component": "curl: libcurl: Unauthorized connection reuse due to a logical error",
+      "vulnerable_feature_or_precondition": "curl Negotiate authentication and connection reuse",
+      "crewflow_applicability": "No application curl Negotiate pool; fixed local healthcheck only.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-8458",
+        "https://security-tracker.debian.org/tracker/CVE-2026-8458"
+      ],
+      "recommendation": "Track vendor correction; bounded feature-specific review.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "libcurl might in some circumstances reuse the wrong connection when asked to\ndo Negotiate-authenticated ones, even when they are set to use different\n\"services\".\n\nlibcurl features a pool of recent connections so that subsequent requests can\nreuse an existing connection to avoid overhead.\n\nWhen reusing a connection a range of criteria must be met. Due to a logical\nerror in the code, a request that was issued by an application could\nwrongfully reuse an existing connection to the same server that was\nauthenticated using different services.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    },
+    {
+      "id": "CVE-2026-9538",
+      "severity": "HIGH",
+      "packages": [
+        {
+          "class": "os-pkgs",
+          "name": "perl-base",
+          "type": "debian",
+          "version": "5.40.1-6+deb13u1"
+        }
+      ],
+      "component": "perl-Archive-Tar: perl-Archive-Tar: Denial of Service via crafted tar header with large entry size",
+      "vulnerable_feature_or_precondition": "Perl Archive::Tar processing",
+      "crewflow_applicability": "Archive::Tar could not be imported in accepted runtime; perl-base alone remains.",
+      "vendor_correction": [
+        "No supported installed-distribution fix recorded in approved snapshot"
+      ],
+      "evidence": [
+        "https://avd.aquasec.com/nvd/cve-2026-9538",
+        "https://security-tracker.debian.org/tracker/CVE-2026-9538"
+      ],
+      "recommendation": "Propose component-specific review, pending owner.",
+      "owner_approval_required": true,
+      "owner_decision": {
+        "status": "pending"
+      },
+      "review_trigger": "Before public deployment, new image/package/source/platform/privilege change, or vendor correction; review by 2026-11-19 (not acceptance expiry).",
+      "baseline_observed_at": "2026-11-05",
+      "raw_description": "Archive::Tar versions before 3.10 for Perl allow memory exhaustion via attacker controlled entry size field in tar header.\n\n_read_tar() reads each entry's payload with $handle->read($$data, $block), where $block is derived from the entry's 12-byte size field in the tar header with no upper bound on that value.\n\nA crafted header declaring a multi-gigabyte size causes Perl to allocate a scalar of that size.",
+      "evidence_notes": "Exact accepted image and package versions; Stage 2E.4D native inventory/feature review. Applicability is proposed and owner-pending, not a suppression."
+    }
+  ],
+  "manual_issues": [
+    {
+      "id": "inactive-ensurepip-pip-25.0.1",
+      "severity": "MANUAL",
+      "component": "Python ensurepip bundled archive, not installed pip26.3",
+      "advisories": [
+        "CVE-2025-8869",
+        "CVE-2026-1703",
+        "CVE-2026-3219",
+        "CVE-2026-6357",
+        "CVE-2026-8643",
+        "CVE-2026-13346"
+      ],
+      "crewflow_applicability": "Inactive archive retained; operational reuse must be prevented. CI uses checksum-verified pip26.3 without ensurepip.",
+      "recommendation": "Separate reviewed correction or explicit bounded owner decision. No removal authorized here.",
+      "owner_decision": {
+        "status": "pending"
+      },
+      "owner_approval_required": true,
+      "review_trigger": "Before public deployment or Python bootstrap/base-image change."
+    }
+  ],
+  "builder_disclosure": {
+    "id": "GHSA-xmj3-9gf7-h52w",
+    "package": "setuptools83.0.0",
+    "scope": "Linux source builder only; Windows legacy wheel installation precondition not used; absent final runtime. Stage2E4D narrow builder-pin approval is not general risk acceptance."
+  }
+}

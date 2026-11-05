@@ -58,6 +58,9 @@ def init_security(app):
 
     @app.after_request
     def _apply_headers(response):
+        # Session-bound JSON and probes must never be reused by shared caches.
+        if request.path.startswith("/api/"):
+            response.headers["Cache-Control"] = "no-store"
         response.headers.setdefault("X-Content-Type-Options", "nosniff")
         response.headers.setdefault("X-Frame-Options", "DENY")
         response.headers.setdefault("Referrer-Policy", "strict-origin-when-cross-origin")

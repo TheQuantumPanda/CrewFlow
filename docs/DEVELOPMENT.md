@@ -1,81 +1,61 @@
 # CrewFlow development
 
-[Project introduction and canonical setup](../README.md) · [API reference](API.md) · [Security architecture](SECURITY.md) · [Screenshots](SCREENSHOTS.md)
+[Setup](../README.md#local-setup) · [API](API.md) · [Security architecture](SECURITY.md) · [Release assurance](release-assurance.md)
 
-Use Python 3.11 or 3.12 and Node.js 20+. Pass 5 used Python 3.11; the existing CI targets 3.12. This project retains the original Flask/SQLAlchemy backend and React/Vite frontend. Internal package names, cookie names, environment variables and module paths intentionally retain TaskForge identifiers.
+Use Python 3.12 (reviewed 3.12.16) and Node 24.21.0. Keep the existing React 18, Flask/SQLAlchemy architecture, API contracts, TaskForge internal cookie/module names and seven-role permission map. No external font service is required.
 
-## Local startup
+## Native prerequisites and isolated installation
 
-Follow the [README setup instructions](../README.md#local-setup) to create a backend virtual environment, install the existing `requirements-dev.txt`, configure `backend/.env` and install frontend packages with `npm ci`.
+Psycopg-C 3.3.8 needs a compiler, Python development headers, libpq headers and `pg_config`. Verify `gcc --version`, `pg_config --version`, `libpq-fe.h` under `pg_config --includedir`, and `Python.h` in Python's include path. The reviewed production target is linux/amd64. Development against another OS/architecture needs its own native compatibility check.
 
-From `backend/`, with its environment activated:
+The README uses `tools/ci/python_env.py` to create a new venv without ensurepip, install only checksum-verified pip 26.3, then use `--build-constraint tools/ci/build-constraints.txt` for the unchanged dev requirements. The source build requires setuptools 83.0.0; wheel 0.48.0 and packaging 26.3 are reviewed builder pins. Do not replace the driver with a binary wheel to avoid native prerequisites. The builder-only Windows advisory is disclosed in [release assurance](release-assurance.md); these tools do not enter the final image. [Runtime details](production-runtime.md) explain system libpq/OpenSSL and the APT bootstrap order.
 
-```bash
-python run.py
-```
+## Local startup and database safety
 
-From `web/`, in another terminal:
+Configure `backend/.env` privately before `cd backend && python run.py`. In another terminal, use `cd web && npm ci && npm run dev`. Vite uses localhost:5173 and proxies `/api` to port 5000 unless `VITE_API_TARGET` is set. `web/dist` is the production frontend build, served by Flask on the same origin as the API.
 
-```bash
-npm run dev
-```
+**Startup may write.** The development default `AUTO_BOOTSTRAP` applies migrations and baseline provisioning. Choose a fresh authorized database deliberately; set `AUTO_BOOTSTRAP=0` whenever startup writes are not approved. First-admin creation now requires an explicit private `BOOTSTRAP_ADMIN_PASSWORD`; no password is generated or logged. Ordinary production workers must not carry that password or migrator credentials. See the controlled sequence in [production runtime](production-runtime.md#controlled-database-preparation).
 
-The browser uses port 5173; Vite proxies `/api` to port 5000 unless `VITE_API_TARGET` is set. No database server is required for a deliberately chosen fresh local SQLite environment. Existing PostgreSQL/MySQL support is configured through `DATABASE_URL` or the original `DB_*` variables; those engines were not live-tested in the customization sprint.
+The existing `seed` command drops and recreates tables and publishes demo credentials; never use it against preserved or public data. Do not run `init-db`, downgrade, reset or repeat first-admin provisioning merely to test connectivity. Public test helpers and an optional `VITE_DEMO_MODE` presentation do not authorize any database writes.
 
-## Database safety
-
-Inspect configuration before starting the backend. With `AUTO_BOOTSTRAP` enabled by default, application startup invokes Alembic upgrades and creates baseline departments/an initial admin when needed. Disable it with `AUTO_BOOTSTRAP=0` when automatic writes are not authorized. Do not point this flow at production data.
-
-The `seed` command **drops and recreates tables** before loading demonstration records. The previous guide incorrectly described it as idempotent. It is not part of the ordinary quick start and must not be run against data that needs to be preserved. Initialization, migration and reseeding were not performed during Pass 5.
-
-Use authorized local accounts. Initial-account credentials, session keys and connection values must remain private; no actual values are included in this guide. Sign-in pages only show the optional original demonstration-account presentation when explicitly enabled with `VITE_DEMO_MODE`.
-
-## Existing checks
-
-Run from `web/`:
+## Checks and evidence
 
 ```bash
+cd web
 npm run typecheck
 npm run test
 npm run build
+npm audit --json
+npm audit --omit=dev --json
 ```
 
-Run from `backend/`, after installing its development requirements:
+From `backend/` with the isolated development environment:
 
 ```bash
-ruff check .
+ruff check --no-cache .
 pytest -q --cov=task_management --cov-report=term-missing
 ```
 
-The backend's `pytest.ini` selects `tests/`. Fixtures create and remove fresh in-memory SQLite schemas per test and use Flask test clients. This deliberately isolated test suite does not require an existing database and is distinct from verifying an actual running backend with persistent development data.
-
-On 2026-11-04, the existing suites passed: 27 frontend tests, 89 backend tests, 77% backend coverage, typecheck/build and Ruff. Backend dependencies were installed at their existing pinned versions in a temporary Python 3.11 environment; project requirement files were not changed. Final browser checks used temporary fictional API responses. Live authenticated workflows remained blocked by the absence of an authorized development database/configuration and test accounts.
-
-Existing dependency audit commands, run from `web/`:
+From the root:
 
 ```bash
-npm audit
-npm audit --omit=dev
+python -m unittest discover -s tools/ci/tests -v
 ```
 
-They reported 9 affected package entries overall and 2 moderate runtime entries during this pass. No automatic audit fixes or dependency upgrades were applied. See the [public verification summary](VERIFICATION.md) for the dated check results, current blockers and limitations. Detailed diagnostic logs remain local and are excluded from publication.
+Ordinary pytest uses fresh in-memory SQLite and Flask test clients. Never point it at a persistent PostgreSQL target. The CI PostgreSQL smoke helper creates its own isolated instance, migrator/runtime roles and bounded fictional records; it rejects external connection URLs. Local use requires separate approval and retains resources. It is real PostgreSQL with Flask test clients, not an HTTPS test. [Verification](VERIFICATION.md) records actual environments and historical/local results.
 
-## Structure and conventions
+The modal return-focus problem was corrected with focused tests. Board/list filters remain independent; native drag-and-drop has no separate touch/keyboard implementation. Preserve these actual feature boundaries in documentation. No complete accessibility certification is claimed.
+
+## Structure
 
 | Location | Responsibility |
 | --- | --- |
-| `backend/task_management/routes/` | HTTP parsing, permission checks and service delegation |
-| `backend/task_management/services/` | Existing validation and business rules |
-| `backend/task_management/models/` | SQLAlchemy models |
-| `backend/task_management/permissions.py` | Canonical role, rank and permission map |
-| `backend/task_management/auth_decorators.py` | Session, console and department restrictions |
-| `backend/migrations/` | Existing Alembic migrations; unchanged by the UI customization |
-| `web/src/api/` | Typed API requests and TanStack Query hooks |
-| `web/src/auth/`, `web/src/layout/` | Route presentation guards and shared navigation |
-| `web/src/pages/`, `web/src/components/` | Screens and existing shared UI primitives |
-| `web/src/styles/` | Shared semantic tokens and scoped CrewFlow presentation |
-| `web/public/brand/` | Original CrewFlow SVG mark and monochrome variant |
+| `backend/task_management/routes`, `services`, `models` | Existing HTTP, business rules and persistence |
+| `backend/task_management/permissions.py` | Authoritative seven-role permission map |
+| `backend/migrations` | Existing Alembic revisions |
+| `web/src/api`, `auth`, `layout`, `pages`, `components` | Typed requests, navigation and presentation |
+| `web/src/styles`, `web/public/brand` | Semantic tokens and original CrewFlow SVG identity |
+| `tools/ci` | Isolated release checks; no application runtime imports except the approved PG smoke |
+| `docs/security-decisions.json` | Owner-pending residual vulnerability register |
 
-Keep backend authorization authoritative. Preserve field names, query contracts and role/department boundaries when working on presentation. Use existing semantic CSS tokens and bundled fonts rather than new frameworks or external font services. The original brand asset generator is documented in [web/public/brand/README.md](../web/public/brand/README.md).
-
-The shared modal's inherited return-focus issue remains deferred; do not treat the visual sprint as authorization to rewrite focus behavior. Runtime library and font license texts accompany build assets in [third-party-notices.txt](../web/public/third-party-notices.txt).
+Keep private `.env`, backups, keys, cookies, scanner caches and archives outside publication. Output diagnostics are ignored. Preserve [MIT](../LICENSE), [complete font/library notices](../web/public/third-party-notices.txt) and [brand source documentation](../web/public/brand/README.md). CrewFlow customizes TaskForge; it does not claim original authorship of its backend.

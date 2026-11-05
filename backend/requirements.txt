@@ -7,7 +7,9 @@ gunicorn==26.2.0
 
 # --- Database drivers ----------------------------------------------------
 # Postgres is the default for hosted deploys (Render / Railway / Neon / Fly).
-psycopg[binary]==3.2.3
+# Build requires a C compiler, Python headers and libpq-dev/pg_config.
+# Docker compiles this separately; runtime links Debian-maintained libraries.
+psycopg[c]==3.3.8
 # MySQL is still supported for local development against the original schema.
 PyMySQL==1.1.1
 cryptography==50.0.2
