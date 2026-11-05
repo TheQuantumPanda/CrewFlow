@@ -113,7 +113,7 @@ export const WORKSPACE_DEMOS: DemoAccount[] = [
 ];
 
 export const CONSOLE_DEMOS: DemoAccount[] = [
-  { role: "Super admin", username: "ayush.yadav", password: "Ayush@123" },
+  { role: "Super admin", username: "demo.superadmin", password: "Demo@12345" },
   { role: "Admin", username: "meera.nair", password: "Admin@123" },
 ];
 

@@ -1,4 +1,4 @@
-"""TaskForge application factory.
+"""CrewFlow application factory.
 
 The Flask app serves two things: a JSON API under `/api`, and the compiled
 React single-page app. Keeping both behind one origin means the session cookie

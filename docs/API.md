@@ -90,7 +90,7 @@ flowchart LR
       "employee_code": "ENG-020",
       "first_name": "Priya",
       "last_name": "Mehta",
-      "email": "priya.mehta@taskforge.dev",
+      "email": "priya.mehta@crewflow.example",
       "position": "Engineering Manager",
       "department_id": 1,
       "department_name": "Engineering",

@@ -1,6 +1,6 @@
--- TaskForge database schema (MySQL 8+)
+-- CrewFlow database schema (MySQL 8+)
 -- Run this once against an empty database before starting the app, e.g.:
---   mysql -u root -p taskforge < database/schema.sql
+--   mysql -u root -p crewflow < database/schema.sql
 --
 -- The Flask app can also create these tables for you via SQLAlchemy
 -- (`flask --app task_management init-db`) — this file exists so the schema
@@ -100,4 +100,4 @@ CREATE INDEX idx_assignments_employee ON task_assignments(employee_id);
 CREATE INDEX idx_assignments_status ON task_assignments(status);
 CREATE INDEX idx_activity_created_at ON activity_logs(created_at);
 
-SELECT 'TaskForge schema created successfully.' AS message;
+SELECT 'CrewFlow schema created successfully.' AS message;

@@ -55,4 +55,4 @@ The previously reproduced modal return-focus defect was corrected in Stage 2D an
 - Native drag-and-drop has no separate touch/keyboard implementation.
 - Dense tables and Kanban columns intentionally scroll inside containers on small screens.
 
-Management load failures have explicit error presentation. Backend authorization remains authoritative. CrewFlow customizes TaskForge; [original MIT attribution](../LICENSE) and [complete library/font notices](../web/public/third-party-notices.txt) remain intact.
+Management load failures have explicit error presentation. Backend authorization remains authoritative. The complete [MIT license](../LICENSE) and [library/font notices](../web/public/third-party-notices.txt) remain intact.

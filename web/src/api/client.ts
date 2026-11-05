@@ -1,5 +1,5 @@
 /**
- * Thin fetch wrapper for the TaskForge API.
+ * Thin fetch wrapper for the CrewFlow API.
  *
  * Auth is a first-party session cookie, so there is no token to store and
  * nothing for a XSS payload to read out of localStorage. The cost of cookie

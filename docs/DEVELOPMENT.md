@@ -2,7 +2,7 @@
 
 [Setup](../README.md#local-setup) · [API](API.md) · [Security architecture](SECURITY.md) · [Release assurance](release-assurance.md)
 
-Use Python 3.12 (reviewed 3.12.16) and Node 24.21.0. Keep the existing React 18, Flask/SQLAlchemy architecture, API contracts, TaskForge internal cookie/module names and seven-role permission map. No external font service is required.
+Use Python 3.12 (reviewed 3.12.16) and Node 24.21.0. Keep the existing React 18, Flask/SQLAlchemy architecture, API contracts, internal cookie/module names and seven-role permission map. No external font service is required.
 
 ## Native prerequisites and isolated installation
 
@@ -58,4 +58,4 @@ The modal return-focus problem was corrected with focused tests. Board/list filt
 | `tools/ci` | Isolated release checks; no application runtime imports except the approved PG smoke |
 | `docs/security-decisions.json` | Owner-pending residual vulnerability register |
 
-Keep private `.env`, backups, keys, cookies, scanner caches and archives outside publication. Output diagnostics are ignored. Preserve [MIT](../LICENSE), [complete font/library notices](../web/public/third-party-notices.txt) and [brand source documentation](../web/public/brand/README.md). CrewFlow customizes TaskForge; it does not claim original authorship of its backend.
+Keep private `.env`, backups, keys, cookies, scanner caches and archives outside publication. Output diagnostics are ignored. Preserve the full [MIT license](../LICENSE), [complete font/library notices](../web/public/third-party-notices.txt) and [brand source documentation](../web/public/brand/README.md).

@@ -78,3 +78,4 @@ Thumbs.db
 # Publish only the selected CrewFlow gallery; retain upstream captures locally
 /docs/screenshots/*
 !/docs/screenshots/crewflow/
+*.png

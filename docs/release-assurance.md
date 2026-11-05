@@ -31,7 +31,7 @@ Only sanitized JSON/text evidence is uploaded for 14 days. Private environments,
 
 ## Review and release sequence
 
-1. User reviews the complete working tree, legal notices and exclusions, then personally stages/commits/pushes. Preserve original TaskForge MIT attribution.
+1. User reviews the complete working tree, legal notices and exclusions, then personally stages/commits/pushes. Preserve the complete MIT license and required notices.
 2. Run hosted CI; inspect actual job results, native prerequisites, fresh feed identity, PostgreSQL smoke and evidence. Local checks do not prove hosted Actions succeeds.
 3. Review remaining vulnerabilities explicitly. Remediate supported relevant fixes or record bounded owner decisions; preserve unresolved vendor contradictions. The inactive archive needs its own decision/correction.
 4. Select the exact scanned candidate and retain source/build/image/scan identity beyond artifact expiry. Publishing/promotion/signing would require a separately authorized process.

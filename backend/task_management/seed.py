@@ -15,7 +15,7 @@ def run():
     db.create_all()
 
     # --- Users & the owner account ------------------------------------
-    ayush = User(username="ayush.yadav", password_hash=_hash("Ayush@123"), role="super_admin")
+    demo_super_admin = User(username="demo.superadmin", password_hash=_hash("Demo@12345"), role="super_admin")
     admin_user = User(username="meera.nair", password_hash=_hash("Admin@123"), role="admin")
     hr_user = User(username="neha.kapoor", password_hash=_hash("Hr@12345"), role="hr")
     manager_user = User(username="priya.mehta", password_hash=_hash("Manager@123"), role="manager")
@@ -25,7 +25,7 @@ def run():
         User(username=name, password_hash=_hash("Employee@123"), role="employee")
         for name in ["aarav.sharma", "rohan.patel", "ananya.iyer", "kabir.singh"]
     ]
-    db.session.add_all([ayush, admin_user, hr_user, manager_user, lead_user, auditor_user, *emp_users])
+    db.session.add_all([demo_super_admin, admin_user, hr_user, manager_user, lead_user, auditor_user, *emp_users])
     db.session.flush()
 
     # --- Departments -----------------------------------------------------
@@ -37,10 +37,10 @@ def run():
 
     # --- Employees ---------------------------------------------------------
     employee_seed = [
-        (emp_users[0], engineering, "ENG-001", "Aarav", "Sharma", "aarav.sharma@taskforge.dev", "9876500001", "Software Engineer"),
-        (emp_users[1], sales, "SAL-001", "Rohan", "Patel", "rohan.patel@taskforge.dev", "9876500002", "Sales Executive"),
-        (emp_users[2], design, "DES-001", "Ananya", "Iyer", "ananya.iyer@taskforge.dev", "9876500003", "UI/UX Designer"),
-        (emp_users[3], engineering, "ENG-002", "Kabir", "Singh", "kabir.singh@taskforge.dev", "9876500004", "QA Engineer"),
+        (emp_users[0], engineering, "ENG-001", "Aarav", "Sharma", "aarav.sharma@crewflow.example", "9876500001", "Software Engineer"),
+        (emp_users[1], sales, "SAL-001", "Rohan", "Patel", "rohan.patel@crewflow.example", "9876500002", "Sales Executive"),
+        (emp_users[2], design, "DES-001", "Ananya", "Iyer", "ananya.iyer@crewflow.example", "9876500003", "UI/UX Designer"),
+        (emp_users[3], engineering, "ENG-002", "Kabir", "Singh", "kabir.singh@crewflow.example", "9876500004", "QA Engineer"),
     ]
     employees = []
     for user, dept, code, first, last, email, phone, position in employee_seed:
@@ -73,7 +73,7 @@ def run():
                 employee_code=code,
                 first_name=first,
                 last_name=last,
-                email=f"{user.username}@taskforge.dev",
+                email=f"{user.username}@crewflow.example",
                 phone=phone,
                 position=position,
                 hire_date=date(2023, 6, 1),
@@ -97,7 +97,7 @@ def run():
             notes="",
             priority=priority,
             estimated_hours=hours,
-            created_by=ayush.id,
+            created_by=demo_super_admin.id,
         )
         db.session.add(task)
         db.session.flush()
@@ -109,7 +109,7 @@ def run():
 
     db.session.add(
         ActivityLog(
-            user_id=ayush.id,
+            user_id=demo_super_admin.id,
             action="SEED",
             entity_type="system",
             entity_id=None,
@@ -121,7 +121,7 @@ def run():
     db.session.commit()
 
     print("Seed complete.")
-    print("  Admin console:  ayush.yadav / Ayush@123 (super admin), meera.nair / Admin@123 (admin)")
+    print("  Admin console:  demo.superadmin / Demo@12345 (super admin), meera.nair / Admin@123 (admin)")
     print("  Workspace:      neha.kapoor / Hr@12345 (HR), priya.mehta / Manager@123 (manager),")
     print("                  vikram.rao / Lead@1234 (team lead), isha.menon / Audit@123 (auditor)")
     print("  Employee login: aarav.sharma / Employee@123 (also rohan.patel, ananya.iyer, kabir.singh)")

@@ -2,7 +2,7 @@
 
 **Keep teams and work in sync.**
 
-CrewFlow is a workforce and task-management platform with role-based workspaces, department-scoped management, task ownership and progress tracking. This portfolio customization gives the existing TaskForge application an original connected-path identity, a navy and indigo interface, and consistent light and dark themes while preserving its underlying application architecture.
+CrewFlow is a workforce and task-management platform with role-based workspaces, department-scoped management, task ownership and progress tracking. It has an original connected-path identity, a navy and indigo interface, and consistent light and dark themes.
 
 ## Screenshots
 
@@ -89,13 +89,13 @@ This produces `web/dist`; it does not deploy the application. [Development detai
 
 ## Environment configuration
 
-`SECRET_KEY` is mandatory in production, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` is required for a new initial administrator. Production workers require reviewed `DATABASE_URL` and `AUTO_BOOTSTRAP=0`; inspect database selection before any startup. Names below are the existing application contracts and retain their internal TaskForge identifiers.
+`SECRET_KEY` is mandatory in production, and an explicit private `BOOTSTRAP_ADMIN_PASSWORD` is required for a new initial administrator. Production workers require reviewed `DATABASE_URL` and `AUTO_BOOTSTRAP=0`; inspect database selection before any startup. The application retains its established internal configuration names.
 
 | Variables | Purpose |
 | --- | --- |
 | `APP_ENV`, `FLASK_ENV` | Configuration selection; development is the default. `FLASK_ENV` also affects the dev runner's debug behavior. |
 | `SECRET_KEY` | Session-signing secret; keep private and stable. |
-| `DATABASE_URL` | Explicit database URL; takes precedence over `DB_*`. Without it or MySQL settings, SQLite uses `backend/instance/taskforge.db`. |
+| `DATABASE_URL` | Explicit database URL; takes precedence over `DB_*`. Without it or MySQL settings, SQLite stores its file under `backend/instance/`. |
 | `DB_HOST`, `DB_PORT`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | Existing alternative MySQL configuration. |
 | `AUTO_BOOTSTRAP`, `BOOTSTRAP_ADMIN_USERNAME`, `BOOTSTRAP_ADMIN_PASSWORD` | Existing migration/baseline initialization and initial-account settings. |
 | `MIN_PASSWORD_LENGTH`, `MAX_FAILED_LOGINS`, `LOCKOUT_MINUTES` | Existing password and lockout policy. |
@@ -142,6 +142,6 @@ The accepted image has zero reported installed Python and npm full/runtime audit
 
 ## License and attribution
 
-CrewFlow is a frontend portfolio customization of **TaskForge**. The original **MIT License, Copyright (c) 2026 Ayush Yadav**, remains in [LICENSE](LICENSE), including its permission and warranty notices. This presentation does not claim authorship of the original backend or permission system.
+The applicable MIT terms and copyright notice are preserved in [LICENSE](LICENSE), including the permission and warranty notices.
 
 The CrewFlow three-path C mark is original SVG geometry. Runtime library and font notices are preserved in [web/public/third-party-notices.txt](web/public/third-party-notices.txt), which is copied into frontend build output. Fonts retain their SIL Open Font License texts; Lucide retains its ISC notice, including the upstream third-party material included in that package's license file.
