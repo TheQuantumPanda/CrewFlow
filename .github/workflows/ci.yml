@@ -149,7 +149,7 @@ jobs:
           docker run -d --name crewflow-ci-health -p 127.0.0.1:8000:8000 \
             -e APP_ENV=production -e SECRET_KEY -e DATABASE_URL=sqlite:// -e AUTO_BOOTSTRAP=0 crewflow:ci
           healthy=0
-          for attempt in $(seq 1 30); do
+          for ((attempt = 1; attempt <= 30; attempt++)); do
             if curl -fsS http://127.0.0.1:8000/api/healthz; then healthy=1; break; fi
             sleep 2
           done
