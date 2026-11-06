@@ -2,7 +2,7 @@
   "schema_version": 1,
   "baseline_image": "crewflow:stage2e4d",
   "baseline_image_id": "sha256:9ac32692050df355acf426999511a5e5e9aaf393279997a37c7f4ed8edd26cb6",
-  "security_scope_sha256": "111e00878ae335947e4b834e058b0ff50277e38f6ac4486af1064224c34638c9",
+  "security_scope_sha256": "a2f4fe96988b2420e191b7072a5ceb32237526ce2d9b3a95bbc3133bbcebd32b",
   "platform": "linux/amd64",
   "distribution": "Debian 13 trixie",
   "policy": "No owner risk acceptance supplied. All Critical block; material new/changed findings fail regression; public release also requires explicit unexpired owner decisions for every listed material/manual issue.",
